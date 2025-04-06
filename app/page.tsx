@@ -5,7 +5,7 @@ import { Code } from "lucide-react"
 import { maskName, getRelativeTime } from "@/utils/code-utils"
 import GuideSection from "@/components/guide-section"
 import Header from "@/components/layout/header"
-
+import Footer from "@/components/layout/footer"
 export default function Home() {
   const codeSnippets = [
     {
@@ -128,7 +128,8 @@ export default function Home() {
           <Code size={24} />
         </Link>
       </div>
+
+      <Footer />
     </main>
   )
 }
-
