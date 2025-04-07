@@ -15,10 +15,8 @@ export default function Home() {
       description: "로컬 스토리지를 쉽게 사용할 수 있는 React 커스텀 훅입니다.",
       language: "TypeScript",
       author: "김민준",
-      likes: 24,
-      views: 128,
       createdAt: "2023-11-15T12:30:00Z",
-      tags: ["React", "Hooks", "Frontend"],
+      deleteAfter: "5분 후 삭제",
     },
     {
       id: 2,
@@ -26,10 +24,8 @@ export default function Home() {
       description: "Spring Security와 JWT를 활용한 인증 시스템 구현 코드입니다.",
       language: "Java",
       author: "이지훈",
-      likes: 36,
-      views: 210,
       createdAt: "2023-11-12T09:15:00Z",
-      tags: ["Spring", "Security", "Backend"],
+      deleteAfter: "8분 후 삭제",
     },
     {
       id: 3,
@@ -37,10 +33,8 @@ export default function Home() {
       description: "Flutter에서 효율적인 무한 스크롤 리스트 구현 방법입니다.",
       language: "Dart",
       author: "박서연",
-      likes: 18,
-      views: 95,
       createdAt: "2023-11-10T14:45:00Z",
-      tags: ["Flutter", "Mobile", "UI"],
+      deleteAfter: "16분 후 삭제",
     },
     {
       id: 4,
@@ -48,10 +42,8 @@ export default function Home() {
       description: "Express 애플리케이션에서 재사용 가능한 미들웨어 작성 방법을 소개합니다.",
       language: "JavaScript",
       author: "최준호",
-      likes: 29,
-      views: 156,
       createdAt: "2023-11-08T08:20:00Z",
-      tags: ["Node.js", "Express", "Backend"],
+      deleteAfter: "10분 후 삭제",
     },
     {
       id: 5,
@@ -59,10 +51,8 @@ export default function Home() {
       description: "Pandas와 Matplotlib을 활용한 데이터 분석 및 시각화 스크립트입니다.",
       language: "Python",
       author: "정다은",
-      likes: 42,
-      views: 231,
       createdAt: "2023-11-05T16:10:00Z",
-      tags: ["Python", "Data Science", "Analytics"],
+      deleteAfter: "20분 후 삭제",
     },
     {
       id: 6,
@@ -70,10 +60,8 @@ export default function Home() {
       description: "Vue.js에서 컴포넌트 간 효율적인 통신 방법에 대한 예제 코드입니다.",
       language: "JavaScript",
       author: "한지민",
-      likes: 15,
-      views: 87,
       createdAt: "2023-11-03T11:30:00Z",
-      tags: ["Vue", "Frontend", "Components"],
+      deleteAfter: "1분 후 삭제",
     },
   ]
 
@@ -92,13 +80,14 @@ export default function Home() {
             <div className="pt-3 pb-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-gray-500 text-xs">{maskName("이지훈")}</span>
-                <span className="text-gray-500 text-xs">1일 전</span>
+                <span className="text-gray-500 text-xs">{codeSnippets[1].deleteAfter}</span>
               </div>
 
               <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600">
-                <Link href="/code/zip-example">
-                  Spring Boot 프로젝트 구조 (ZIP 파일)
+                <Link href="/code/zip">
+                  Spring Boot 프로젝트 구조
                 </Link>
+                <span className="ml-3 px-2 py-1 text-green-600 bg-green-50 text-xs rounded-md font-normal">ZIP 파일</span>
               </h2>
             </div>
 
@@ -106,15 +95,14 @@ export default function Home() {
               <div key={snippet.id} className="pt-3 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-xs">{maskName(snippet.author)}</span>
-                  <span className="text-gray-500 text-xs">
-                    {getRelativeTime(snippet.createdAt)}
-                  </span>
+                  <span className="text-gray-500 text-xs">{snippet.deleteAfter}</span>
                 </div>
 
-                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600">
+                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
                   <Link href={`/code/${snippet.id}`}>
                     {snippet.title}
                   </Link>
+                  <span className="ml-3 px-2 py-1 text-yellow-600 bg-yellow-50 text-xs rounded-md font-normal">코드</span>
                 </h2>
               </div>
             ))}
