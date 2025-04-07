@@ -6,8 +6,11 @@ import { maskName, getRelativeTime } from "@/utils/code-utils"
 import GuideSection from "@/components/guide-section"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
+import { useState } from "react"
 
 export default function Home() {
+  const [category, setCategory] = useState("전체")
+
   const codeSnippets = [
     {
       id: 1,
@@ -17,6 +20,7 @@ export default function Home() {
       author: "김민준",
       createdAt: "2023-11-15T12:30:00Z",
       deleteAfter: "5분 후 삭제",
+      type: "코드"
     },
     {
       id: 2,
@@ -26,6 +30,7 @@ export default function Home() {
       author: "이지훈",
       createdAt: "2023-11-12T09:15:00Z",
       deleteAfter: "8분 후 삭제",
+      type: "ZIP 파일"
     },
     {
       id: 3,
@@ -35,6 +40,7 @@ export default function Home() {
       author: "박서연",
       createdAt: "2023-11-10T14:45:00Z",
       deleteAfter: "16분 후 삭제",
+      type: "코드"
     },
     {
       id: 4,
@@ -44,6 +50,7 @@ export default function Home() {
       author: "최준호",
       createdAt: "2023-11-08T08:20:00Z",
       deleteAfter: "10분 후 삭제",
+      type: "코드"
     },
     {
       id: 5,
@@ -53,6 +60,7 @@ export default function Home() {
       author: "정다은",
       createdAt: "2023-11-05T16:10:00Z",
       deleteAfter: "20분 후 삭제",
+      type: "파일 및 이미지"
     },
     {
       id: 6,
@@ -62,8 +70,13 @@ export default function Home() {
       author: "한지민",
       createdAt: "2023-11-03T11:30:00Z",
       deleteAfter: "1분 후 삭제",
+      type: "코드"
     },
   ]
+
+  const filteredSnippets = category === "전체" 
+    ? codeSnippets 
+    : codeSnippets.filter(snippet => snippet.type === category)
 
   return (
     <main className="min-h-screen bg-white">
@@ -72,26 +85,29 @@ export default function Home() {
         <GuideSection />
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 border-b pb-1.5 mb-4">
-            최근 등록된 코드
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-1.5 mb-4 flex items-center justify-between">
+            <span>최근 등록된 코드</span>
+            <div className="relative w-36">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="block appearance-none w-full bg-gray-50 border border-gray-300 text-gray-700 py-1 px-2.5 rounded-md text-sm font-medium pr-8"
+              >
+                <option value="전체">전체</option>
+                <option value="ZIP 파일">ZIP 파일</option>
+                <option value="파일 및 이미지">파일 및 이미지</option>
+                <option value="코드">코드</option>
+              </select>
+              <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </h2>
 
           <div className="divide-y divide-gray-200">
-            <div className="pt-3 pb-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-gray-500 text-xs">{maskName("이지훈")}</span>
-                <span className="text-gray-500 text-xs">{codeSnippets[1].deleteAfter}</span>
-              </div>
-
-              <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600">
-                <Link href="/code/zip">
-                  Spring Boot 프로젝트 구조
-                </Link>
-                <span className="ml-3 px-2 py-1 text-green-600 bg-green-50 text-xs rounded-md font-normal">ZIP 파일</span>
-              </h2>
-            </div>
-
-            {codeSnippets.map((snippet) => (
+            {filteredSnippets.map((snippet) => (
               <div key={snippet.id} className="pt-3 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-xs">{maskName(snippet.author)}</span>
@@ -102,12 +118,18 @@ export default function Home() {
                   <Link href={`/code/${snippet.id}`}>
                     {snippet.title}
                   </Link>
-                  <span className="ml-3 px-2 py-1 text-yellow-600 bg-yellow-50 text-xs rounded-md font-normal">코드</span>
+                  <span 
+                    className={`ml-3 px-2 py-1 text-${snippet.type === "코드" ? "yellow-600" : snippet.type === "ZIP 파일" ? "green-600" : "blue-600"} 
+                               bg-${snippet.type === "코드" ? "yellow-50" : snippet.type === "ZIP 파일" ? "green-50" : "blue-50"} 
+                               text-xs rounded-md font-normal`}>
+                    {snippet.type}
+                  </span>
                 </h2>
               </div>
             ))}
           </div>
         </div>
+
         <div className="flex justify-center mt-8">
           <div className="inline-flex space-x-1">
             <button className="px-3 py-1 bg-blue-500 text-white rounded-md">1</button>

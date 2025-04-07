@@ -22,12 +22,12 @@ export default function Header() {
             <Image
               src="/site-logo.svg"
               alt="Site Logo"
-              width={60}
-              height={60}
+              width={20}
+              height={20}
               className="object-contain"
             />
             <Link href="/" className="text-xl font-bold text-black">
-              부산소프트웨어마이스터고 코드 쉐어
+              딸깍
             </Link>
           </div>
 
