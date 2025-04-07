@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { Code } from "lucide-react"
 import GuideSection from "@/components/guide"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import { useState } from "react"
+import { maskName } from "@/utils/code-utils"
 
 export default function Home() {
   const [category, setCategory] = useState("전체")
@@ -111,6 +111,22 @@ export default function Home() {
           </h2>
 
           <div className="divide-y divide-gray-200">
+            <div className="py-2.5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-gray-500 text-xs">192.10.⚹⚹⚹.⚹⚹</span>
+                <span className="text-gray-500 text-xs">5분 후 삭제</span>
+              </div>
+
+              <Link href="/code/zip" className="block">
+                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
+                  <span>Spring Boot 프로젝트 구조</span>
+                  <span className="ml-3 px-2 py-1 text-xs rounded-md font-normal text-green-600 bg-green-50">
+                    ZIP 파일
+                  </span>
+                </h2>
+              </Link>
+            </div>
+
             {filteredSnippets.map((snippet) => (
               <div key={snippet.id} className="pt-3 pb-3">
                 <div className="flex items-center gap-2">

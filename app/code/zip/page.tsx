@@ -25,7 +25,7 @@ export default function ZipExamplePage() {
         </Link>
 
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Spring Boot 프로젝트 구조 (ZIP 파일)</h1>
+          <h1 className="text-3xl font-bold">Spring Boot 프로젝트 구조</h1>
         </div>
 
         <ZipViewer fileTree={fileTree} onDownload={handleDownloadZip} />
@@ -33,4 +33,3 @@ export default function ZipExamplePage() {
     </div>
   )
 }
-
