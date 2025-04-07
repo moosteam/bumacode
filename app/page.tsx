@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Code } from "lucide-react"
-import GuideSection from "@/components/guide-section"
+import GuideSection from "@/components/guide"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import { useState } from "react"
