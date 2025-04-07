@@ -1,8 +1,10 @@
 import Link from "next/link"
 import Image from "next/image"
-import { User } from "lucide-react"
 
 export default function Header() {
+  const ip = "192.168.1.1";
+  const formattedIp = ip.split('.').join(' . ');
+
   return (
     <>
       <div className="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-3 px-4">
@@ -26,16 +28,18 @@ export default function Header() {
               height={20}
               className="object-contain"
             />
-            <Link href="/" className="text-xl font-bold text-black">
+            <Link href="/" className="text-xl font-bold text-black ml-2">
               딸깍
             </Link>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-500">
-              <User size={20} />
-              <span>로그인</span>
-            </Link>
+          <div className="flex items-center gap-4 text-gray-600">
+            <div className="flex items-center gap-1 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 mr-1">
+                <path fillRule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
+              </svg>
+              <span>{formattedIp}</span>
+            </div>
           </div>
         </div>
       </header>
