@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "BSSM Code Share",
+  title: "딸깍",
   description: "부산소프트웨어마이스터고 학생들을 위한 코드 공유 서비스입니다.",
   generator: "siniseong",
 }
