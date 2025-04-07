@@ -1,6 +1,6 @@
 import Link from "next/link"
+import Image from "next/image"
 import { User } from "lucide-react"
-import CodeIcon from "@/components/ui/code-icon"
 
 export default function Header() {
   return (
@@ -8,7 +8,7 @@ export default function Header() {
       <div className="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-3 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center text-white">
-            <h1 className="text-12 font-light">
+            <h1 className="text-sm font-light text-center">
               <span className="mr-2">📢</span>이 서비스의 목적은 오직{" "}
               <span className="underline font-bold">코드 공유</span>입니다.
             </h1>
@@ -19,7 +19,13 @@ export default function Header() {
       <header className="border-b">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CodeIcon className="text-blue-500" size={24} />
+            <Image
+              src="/site-logo.svg"
+              alt="Site Logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
             <Link href="/" className="text-xl font-bold text-black">
               부산소프트웨어마이스터고 코드 쉐어
             </Link>
@@ -36,4 +42,3 @@ export default function Header() {
     </>
   )
 }
-

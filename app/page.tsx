@@ -6,6 +6,7 @@ import { maskName, getRelativeTime } from "@/utils/code-utils"
 import GuideSection from "@/components/guide-section"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
+
 export default function Home() {
   const codeSnippets = [
     {
@@ -79,38 +80,48 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white">
       <Header />
-
       <div className="max-w-6xl mx-auto px-4 py-6">
         <GuideSection />
 
-        <div className="divide-y divide-gray-200">
-          <div className="py-2.5">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-gray-500 text-xs">{maskName("이지훈")}</span>
-              <span className="text-gray-500 text-xs">1일 전</span>
-            </div>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-1.5 mb-4">
+            최근 등록된 코드
+          </h2>
 
-            <Link href="/code/zip-example" className="block">
-              <h2 className="text-base font-bold hover:text-blue-500">Spring Boot 프로젝트 구조 (ZIP 파일)</h2>
-            </Link>
-          </div>
-
-          {codeSnippets.map((snippet) => (
-            <div key={snippet.id} className="py-2.5">
+          <div className="divide-y divide-gray-200">
+            <div className="pt-3 pb-3">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-gray-500 text-xs">{maskName(snippet.author)}</span>
-                <span className="text-gray-500 text-xs">{getRelativeTime(snippet.createdAt)}</span>
+                <span className="text-gray-500 text-xs">{maskName("이지훈")}</span>
+                <span className="text-gray-500 text-xs">1일 전</span>
               </div>
 
-              <Link href={`/code/${snippet.id}`} className="block">
-                <h2 className="text-base font-bold hover:text-blue-500">{snippet.title}</h2>
-              </Link>
+              <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600">
+                <Link href="/code/zip-example">
+                  Spring Boot 프로젝트 구조 (ZIP 파일)
+                </Link>
+              </h2>
             </div>
-          ))}
-        </div>
 
+            {codeSnippets.map((snippet) => (
+              <div key={snippet.id} className="pt-3 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 text-xs">{maskName(snippet.author)}</span>
+                  <span className="text-gray-500 text-xs">
+                    {getRelativeTime(snippet.createdAt)}
+                  </span>
+                </div>
+
+                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600">
+                  <Link href={`/code/${snippet.id}`}>
+                    {snippet.title}
+                  </Link>
+                </h2>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="flex justify-center mt-8">
-          <div className="inline-flex">
+          <div className="inline-flex space-x-1">
             <button className="px-3 py-1 bg-blue-500 text-white rounded-md">1</button>
             <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">2</button>
             <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">3</button>
@@ -128,7 +139,6 @@ export default function Home() {
           <Code size={24} />
         </Link>
       </div>
-
       <Footer />
     </main>
   )
