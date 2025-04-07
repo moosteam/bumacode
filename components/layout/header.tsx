@@ -9,7 +9,7 @@ export default function Header() {
   const [ip, setIp] = useState("");
   const [isIpVisible, setIsIpVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchIp = async () => {
       try {
@@ -25,12 +25,12 @@ export default function Header() {
 
     fetchIp();
   }, []);
-  
+
   const formatIp = (ip: string) => {
     const parts = ip.split('.');
     if (parts.length === 4) {
       return `${parts[0]}.${parts[1]}.⚹⚹⚹.⚹⚹`;
-    } 
+    }
     return ip;
   };
 
@@ -74,11 +74,21 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4 text-gray-600">
+            <Link
+              href="/write"
+              className="flex items-center gap-1 text-sm hover:text-black transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-1">
+                <path fillRule="evenodd" d="M14.447 3.026a.75.75 0 0 1 .527.921l-4.5 16.5a.75.75 0 0 1-1.448-.394l4.5-16.5a.75.75 0 0 1 .921-.527ZM16.72 6.22a.75.75 0 0 1 1.06 0l5.25 5.25a.75.75 0 0 1 0 1.06l-5.25 5.25a.75.75 0 1 1-1.06-1.06L21.44 12l-4.72-4.72a.75.75 0 0 1 0-1.06Zm-9.44 0a.75.75 0 0 1 0 1.06L2.56 12l4.72 4.72a.75.75 0 0 1-1.06 1.06L.97 12.53a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+              </svg>
+              작성하기
+            </Link>
+
             <div
               className="flex items-center gap-2 text-sm cursor-pointer"
               onClick={handleIpClick}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-4">
                 <path fillRule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
               </svg>
               <span className="inline-flex items-center gap-2">
