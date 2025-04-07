@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { Code } from "lucide-react"
-import { maskName, getRelativeTime } from "@/utils/code-utils"
 import GuideSection from "@/components/guide-section"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
@@ -17,66 +16,60 @@ export default function Home() {
       title: "React 커스텀 훅: useLocalStorage",
       description: "로컬 스토리지를 쉽게 사용할 수 있는 React 커스텀 훅입니다.",
       language: "TypeScript",
-      author: "김민준",
       createdAt: "2023-11-15T12:30:00Z",
       deleteAfter: "5분 후 삭제",
-      type: "코드"
+      type: "코드",
     },
     {
       id: 2,
       title: "Spring Boot JWT 인증 구현 예제",
       description: "Spring Security와 JWT를 활용한 인증 시스템 구현 코드입니다.",
       language: "Java",
-      author: "이지훈",
       createdAt: "2023-11-12T09:15:00Z",
       deleteAfter: "8분 후 삭제",
-      type: "ZIP 파일"
+      type: "ZIP 파일",
     },
     {
       id: 3,
       title: "Flutter 무한 스크롤 구현하기",
       description: "Flutter에서 효율적인 무한 스크롤 리스트 구현 방법입니다.",
       language: "Dart",
-      author: "박서연",
       createdAt: "2023-11-10T14:45:00Z",
       deleteAfter: "16분 후 삭제",
-      type: "코드"
+      type: "코드",
     },
     {
       id: 4,
       title: "Node.js Express 미들웨어 작성법",
       description: "Express 애플리케이션에서 재사용 가능한 미들웨어 작성 방법을 소개합니다.",
       language: "JavaScript",
-      author: "최준호",
       createdAt: "2023-11-08T08:20:00Z",
       deleteAfter: "10분 후 삭제",
-      type: "코드"
+      type: "코드",
     },
     {
       id: 5,
       title: "Python 데이터 분석 스크립트",
       description: "Pandas와 Matplotlib을 활용한 데이터 분석 및 시각화 스크립트입니다.",
       language: "Python",
-      author: "정다은",
       createdAt: "2023-11-05T16:10:00Z",
       deleteAfter: "20분 후 삭제",
-      type: "파일 및 이미지"
+      type: "파일 및 이미지",
     },
     {
       id: 6,
       title: "Vue.js 컴포넌트 통신 예제",
       description: "Vue.js에서 컴포넌트 간 효율적인 통신 방법에 대한 예제 코드입니다.",
       language: "JavaScript",
-      author: "한지민",
       createdAt: "2023-11-03T11:30:00Z",
       deleteAfter: "1분 후 삭제",
-      type: "코드"
+      type: "코드",
     },
   ]
 
   const filteredSnippets = category === "전체" 
     ? codeSnippets 
-    : codeSnippets.filter(snippet => snippet.type === category)
+    : codeSnippets.filter((snippet) => snippet.type === category)
 
   return (
     <main className="min-h-screen bg-white">
@@ -99,8 +92,19 @@ export default function Home() {
                 <option value="코드">코드</option>
               </select>
               <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4 text-gray-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
@@ -110,18 +114,22 @@ export default function Home() {
             {filteredSnippets.map((snippet) => (
               <div key={snippet.id} className="pt-3 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs">{maskName(snippet.author)}</span>
+                  <span className="text-gray-500 text-xs">192.10.⚹⚹⚹.⚹⚹</span>
                   <span className="text-gray-500 text-xs">{snippet.deleteAfter}</span>
                 </div>
 
                 <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
-                  <Link href={`/code/${snippet.id}`}>
-                    {snippet.title}
-                  </Link>
-                  <span 
-                    className={`ml-3 px-2 py-1 text-${snippet.type === "코드" ? "yellow-600" : snippet.type === "ZIP 파일" ? "green-600" : "blue-600"} 
-                               bg-${snippet.type === "코드" ? "yellow-50" : snippet.type === "ZIP 파일" ? "green-50" : "blue-50"} 
-                               text-xs rounded-md font-normal`}>
+                  <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
+                  <span
+                    className={`ml-3 px-2 py-1 text-xs rounded-md font-normal 
+                      ${snippet.type === "코드"
+                        ? "text-yellow-600 bg-yellow-50"
+                        : snippet.type === "ZIP 파일"
+                        ? "text-green-600 bg-green-50"
+                        : snippet.type === "파일 및 이미지"
+                        ? "text-blue-600 bg-blue-50"
+                        : ""}`}
+                  >
                     {snippet.type}
                   </span>
                 </h2>
