@@ -16,7 +16,6 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log({ email, password, rememberMe })
-    // 로그인 로직 구현
   }
 
   return (
