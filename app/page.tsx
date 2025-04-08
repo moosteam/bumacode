@@ -5,7 +5,6 @@ import GuideSection from "@/components/guide"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import { useState } from "react"
-import { maskName } from "@/utils/code-utils"
 
 export default function Home() {
   const [category, setCategory] = useState("전체")
@@ -14,7 +13,6 @@ export default function Home() {
     {
       id: 1,
       title: "React 커스텀 훅: useLocalStorage",
-      description: "로컬 스토리지를 쉽게 사용할 수 있는 React 커스텀 훅입니다.",
       language: "TypeScript",
       createdAt: "2023-11-15T12:30:00Z",
       deleteAfter: "5분 후 삭제",
@@ -23,7 +21,6 @@ export default function Home() {
     {
       id: 2,
       title: "Spring Boot JWT 인증 구현 예제",
-      description: "Spring Security와 JWT를 활용한 인증 시스템 구현 코드입니다.",
       language: "Java",
       createdAt: "2023-11-12T09:15:00Z",
       deleteAfter: "8분 후 삭제",
@@ -32,7 +29,6 @@ export default function Home() {
     {
       id: 3,
       title: "Flutter 무한 스크롤 구현하기",
-      description: "Flutter에서 효율적인 무한 스크롤 리스트 구현 방법입니다.",
       language: "Dart",
       createdAt: "2023-11-10T14:45:00Z",
       deleteAfter: "16분 후 삭제",
@@ -41,7 +37,6 @@ export default function Home() {
     {
       id: 4,
       title: "Node.js Express 미들웨어 작성법",
-      description: "Express 애플리케이션에서 재사용 가능한 미들웨어 작성 방법을 소개합니다.",
       language: "JavaScript",
       createdAt: "2023-11-08T08:20:00Z",
       deleteAfter: "10분 후 삭제",
@@ -50,7 +45,6 @@ export default function Home() {
     {
       id: 5,
       title: "Python 데이터 분석 스크립트",
-      description: "Pandas와 Matplotlib을 활용한 데이터 분석 및 시각화 스크립트입니다.",
       language: "Python",
       createdAt: "2023-11-05T16:10:00Z",
       deleteAfter: "20분 후 삭제",
@@ -59,7 +53,6 @@ export default function Home() {
     {
       id: 6,
       title: "Vue.js 컴포넌트 통신 예제",
-      description: "Vue.js에서 컴포넌트 간 효율적인 통신 방법에 대한 예제 코드입니다.",
       language: "JavaScript",
       createdAt: "2023-11-03T11:30:00Z",
       deleteAfter: "1분 후 삭제",
@@ -68,7 +61,6 @@ export default function Home() {
     {
       id: 7,
       title: "Spring Boot 프로젝트 구조",
-      description: "Spring Boot 프로젝트의 기본적인 폴더 구조와 설정 파일들에 대한 설명입니다.",
       language: "Java",
       createdAt: "2023-11-01T14:30:00Z",
       deleteAfter: "15분 후 삭제",
