@@ -1,9 +1,14 @@
 "use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Download, Folder } from "lucide-react"
 import CodeViewer from "@/components/code-viewer"
 import { downloadCode, maskName, getRelativeTime, languageColors } from "@/utils/code-utils"
 import Header from "@/components/layout/header"
+import useFileTree from "@/hooks/use-file-tree"
+import FileTree, { type FileNode } from "@/components/file-tree"
+import FileViewer from "@/components/file-viewer"
 
 const codeSnippets = [
   {
@@ -53,7 +58,7 @@ return [storedValue, setStoredValue];
 
 // 사용 예시
 // const [name, setName] = useLocalStorage<string>("name", "");
-// const [items, setItems] = useLocalStorage<string[]>("items", []);`,
+// const [items, setItems] = useLocalStorage<string[]>("items", []);`
   },
   {
     id: 2,
@@ -67,11 +72,50 @@ return [storedValue, setStoredValue];
     tags: ["Spring", "Security", "Backend"],
     code: `// 샘플 코드`,
   },
+  {
+    id: 7,
+    title: "Spring Boot 프로젝트 구조",
+    description: "Spring Boot 프로젝트의 기본적인 폴더 구조와 설정 파일들에 대한 설명입니다.",
+    language: "Java",
+    author: "이지훈",
+    likes: 15,
+    views: 85,
+    createdAt: "2023-11-01T14:30:00Z",
+    tags: ["Spring", "Java", "Backend"],
+    code: `// 샘플 코드`,
+  },
 ]
 
 export default function CodeDetailPage({ params }: { params: { id: string } }) {
-  const id = Number.parseInt(params.id)
+  const id = Number.parseInt(params.id as string) // 여기서 타입을 string으로 변환
   const snippet = codeSnippets.find((s) => s.id === id)
+  const { fileTree, loadExampleZip, handleDownloadZip } = useFileTree()
+  const [title, setTitle] = useState("")
+  const [selectedFile, setSelectedFile] = useState<FileNode | null>(null)
+
+  useEffect(() => {
+    if (id === 7) {
+      setTitle("Spring Boot 프로젝트 구조")
+      loadExampleZip()
+    }
+  }, [id, loadExampleZip])
+
+  const handleDownloadCode = () => {
+    const filename = snippet?.title
+      .replace(/[^\w\s]/gi, "")
+      .replace(/\s+/g, "_")
+      .toLowerCase()
+
+    if (snippet) {
+      downloadCode(snippet.code, filename, snippet.language)
+    }
+  }
+
+  const relativeTime = snippet ? getRelativeTime(snippet.createdAt) : ""
+
+  const handleSelectFile = (node: FileNode) => {
+    setSelectedFile(node)
+  }
 
   if (!snippet) {
     return (
@@ -83,17 +127,6 @@ export default function CodeDetailPage({ params }: { params: { id: string } }) {
       </div>
     )
   }
-
-  const handleDownloadCode = () => {
-    const filename = snippet.title
-      .replace(/[^\w\s]/gi, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase()
-
-    downloadCode(snippet.code, filename, snippet.language)
-  }
-
-  const relativeTime = getRelativeTime(snippet.createdAt)
 
   return (
     <div className="min-h-screen bg-white">
@@ -115,11 +148,37 @@ export default function CodeDetailPage({ params }: { params: { id: string } }) {
           <h1 className="text-3xl font-bold">{snippet.title}</h1>
         </div>
 
-        <div className="mb-6">
-          <CodeViewer code={snippet.code} language={snippet.language} onDownload={handleDownloadCode} />
-        </div>
+        {id === 7 ? (
+          <div className="border rounded-lg overflow-hidden bg-gray-50">
+            <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+              <div className="text-sm font-medium flex items-center">
+                <Folder size={16} className="mr-2" />
+                <span>폴더 구조</span>
+              </div>
+              {handleDownloadZip && (
+                <button onClick={handleDownloadZip} className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-700">
+                  <Download size={14} />
+                  <span>ZIP 다운로드</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex h-[500px]">
+              <div className="w-1/3 border-r overflow-y-auto bg-gray-50 hide-scrollbar">
+                <FileTree root={fileTree} onSelectFile={handleSelectFile} />
+              </div>
+
+              <div className="w-2/3 overflow-hidden">
+                <FileViewer file={selectedFile} />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6">
+            <CodeViewer code={snippet.code} language={snippet.language} onDownload={handleDownloadCode} />
+          </div>
+        )}
       </div>
     </div>
   )
 }
-

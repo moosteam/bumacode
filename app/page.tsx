@@ -65,6 +65,15 @@ export default function Home() {
       deleteAfter: "1분 후 삭제",
       type: "코드",
     },
+    {
+      id: 7,
+      title: "Spring Boot 프로젝트 구조",
+      description: "Spring Boot 프로젝트의 기본적인 폴더 구조와 설정 파일들에 대한 설명입니다.",
+      language: "Java",
+      createdAt: "2023-11-01T14:30:00Z",
+      deleteAfter: "15분 후 삭제",
+      type: "ZIP 파일",
+    },
   ]
 
   const filteredSnippets = category === "전체" 
@@ -111,22 +120,6 @@ export default function Home() {
           </h2>
 
           <div className="divide-y divide-gray-200">
-            <div className="py-2.5">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-gray-500 text-xs">192.10.⚹⚹⚹.⚹⚹</span>
-                <span className="text-gray-500 text-xs">5분 후 삭제</span>
-              </div>
-
-              <Link href="/code/zip" className="block">
-                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
-                  <span>Spring Boot 프로젝트 구조</span>
-                  <span className="ml-3 px-2 py-1 text-xs rounded-md font-normal text-green-600 bg-green-50">
-                    ZIP 파일
-                  </span>
-                </h2>
-              </Link>
-            </div>
-
             {filteredSnippets.map((snippet) => (
               <div key={snippet.id} className="pt-3 pb-3">
                 <div className="flex items-center gap-2">
@@ -137,14 +130,15 @@ export default function Home() {
                 <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
                   <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
                   <span
-                    className={`ml-3 px-2 py-1 text-xs rounded-md font-normal 
-                      ${snippet.type === "코드"
+                    className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${
+                      snippet.type === "코드"
                         ? "text-yellow-600 bg-yellow-50"
                         : snippet.type === "ZIP 파일"
                         ? "text-green-600 bg-green-50"
                         : snippet.type === "파일 및 이미지"
                         ? "text-blue-600 bg-blue-50"
-                        : ""}`}
+                        : ""
+                    }`}
                   >
                     {snippet.type}
                   </span>
