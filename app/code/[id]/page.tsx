@@ -9,6 +9,7 @@ import Header from "@/components/layout/header"
 import useFileTree from "@/hooks/use-file-tree"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import FileViewer from "@/components/file-viewer"
+import React from "react"
 
 const codeSnippets = [
   {
@@ -86,8 +87,10 @@ return [storedValue, setStoredValue];
   },
 ]
 
-export default function CodeDetailPage({ params }: { params: { id: string } }) {
-  const id = Number.parseInt(params.id as string) // 여기서 타입을 string으로 변환
+export default function CodeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const unwrappedParams = React.use(params)
+  const idString = unwrappedParams.id
+  const id = idString ? Number.parseInt(idString) : null
   const snippet = codeSnippets.find((s) => s.id === id)
   const { fileTree, loadExampleZip, handleDownloadZip } = useFileTree()
   const [title, setTitle] = useState("")
@@ -102,9 +105,11 @@ export default function CodeDetailPage({ params }: { params: { id: string } }) {
 
   const handleDownloadCode = () => {
     const filename = snippet?.title
-      .replace(/[^\w\s]/gi, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase()
+      ? snippet.title
+          .replace(/[^\w\s]/gi, "")
+          .replace(/\s+/g, "_")
+          .toLowerCase()
+      : "code_snippet"
 
     if (snippet) {
       downloadCode(snippet.code, filename, snippet.language)
