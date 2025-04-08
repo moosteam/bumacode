@@ -68,9 +68,15 @@ export default function Home() {
     },
   ]
 
-  const filteredSnippets = category === "전체" 
-    ? codeSnippets 
+  const parseDeleteAfter = (text: string) => {
+    const match = text.match(/(\d+)/)
+    return match ? parseInt(match[1], 10) : 0
+  }
+
+  const filteredSnippets = (category === "전체"
+    ? codeSnippets
     : codeSnippets.filter((snippet) => snippet.type === category)
+  ).sort((a, b) => parseDeleteAfter(b.deleteAfter) - parseDeleteAfter(a.deleteAfter))
 
   return (
     <main className="min-h-screen bg-white">
