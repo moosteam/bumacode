@@ -24,11 +24,6 @@ export const downloadCode = (code: string, filename: string, language: string) =
   URL.revokeObjectURL(url)
 }
 
-export const maskName = (name: string) => {
-  if (name.length <= 1) return name || ""
-  return name.charAt(0) + "*".repeat(name.length - 1)
-}
-
 export const getRelativeTime = (dateString: string): string => {
   return ""
 }
