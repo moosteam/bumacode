@@ -2,29 +2,40 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Loader2 } from "lucide-react"
+import { atom, useAtom } from "jotai"
+
+const ipAtom = atom("")
+const isIpVisibleAtom = atom(false)
+const isLoadingAtom = atom(true)
 
 export default function Header() {
-  const [ip, setIp] = useState("");
-  const [isIpVisible, setIsIpVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [ip, setIp] = useAtom(ipAtom)
+  const [isIpVisible, setIsIpVisible] = useAtom(isIpVisibleAtom)
+  const [isLoading, setIsLoading] = useAtom(isLoadingAtom)
 
   useEffect(() => {
-    const fetchIp = async () => {
-      try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        setIp(data.ip);
-      } catch (error) {
-        console.error("IP 주소를 가져오는 데 실패했습니다.", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (ip === "" || isLoading) {
+      const fetchIp = async () => {
+        try {
+          const response = await fetch('https://api.ipify.org?format=json');
+          const data = await response.json();
+          const newIp = data.ip;
 
-    fetchIp();
-  }, []);
+          if (newIp !== ip) {
+            setIp(newIp);
+          }
+        } catch (error) {
+          console.error("IP 주소를 가져오는 데 실패했습니다.", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchIp();
+    }
+  }, [ip, setIp, isLoading, setIsLoading]);
 
   const formatIp = (ip: string) => {
     const parts = ip.split('.');
@@ -41,6 +52,10 @@ export default function Header() {
     setTimeout(() => {
       setIsIpVisible(false);
     }, 3000);
+  };
+
+  const refreshIp = () => {
+    setIsLoading(true);
   };
 
   return (
@@ -97,7 +112,9 @@ export default function Header() {
                     내 IP · <Loader2 className="w-4 h-4 animate-spin" />
                   </>
                 ) : (
-                  `내 IP · ${isIpVisible ? ip : formattedIp}`
+                  <>
+                    내 IP · {isIpVisible ? ip : formattedIp}
+                  </>
                 )}
               </span>
             </div>
