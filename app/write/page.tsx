@@ -8,85 +8,12 @@ import JSZip from "jszip"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import FileViewer from "@/components/file-viewer"
 import Header from "@/components/layout/header"
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github.css'
-
-const detectLanguage = (code: string): string => {
-  if (code.includes("import React") || code.includes("useState") || code.includes("function") || code.includes("=>")) {
-    if (code.includes("interface") || code.includes("<T>") || code.includes(": ")) {
-      return "typescript"
-    }
-    return "javascript"
-  } else if (code.includes("public class") || code.includes("private void")) {
-    return "java"
-  } else if (code.includes("def ") || code.includes("import numpy") || code.includes("print(")) {
-    return "python"
-  } else if (code.includes("using System;") || code.includes("namespace")) {
-    return "csharp"
-  } else if (code.includes("#include") || code.includes("int main()")) {
-    return "cpp"
-  } else if (code.includes("package main") || code.includes("func")) {
-    return "go"
-  } else if (code.includes("fn main()") || code.includes("use std::")) {
-    return "rust"
-  }
-
-  return "javascript"
-}
-
-const detectLanguageFromExtension = (filename: string): string => {
-  const ext = filename.split(".").pop()?.toLowerCase() || ""
-
-  switch (ext) {
-    case "js":
-      return "javascript"
-    case "ts":
-    case "tsx":
-      return "typescript"
-    case "py":
-      return "python"
-    case "java":
-      return "java"
-    case "cs":
-      return "csharp"
-    case "cpp":
-    case "c":
-    case "h":
-    case "hpp":
-      return "cpp"
-    case "go":
-      return "go"
-    case "rs":
-      return "rust"
-    default:
-      return "javascript"
-  }
-}
-
-const languageDisplayNames: Record<string, string> = {
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  java: "Java",
-  python: "Python",
-  csharp: "C#",
-  cpp: "C++",
-  go: "Go",
-  rust: "Rust",
-}
-
-const getHighlightJsLanguage = (language: string): string => {
-  const languageMap: Record<string, string> = {
-    javascript: "javascript",
-    typescript: "typescript",
-    python: "python",
-    java: "java",
-    csharp: "csharp",
-    cpp: "cpp",
-    go: "go",
-    rust: "rust",
-  }
-  return languageMap[language] || "plaintext"
-}
+import CodeHighlighter, { 
+  detectLanguage, 
+  detectLanguageFromExtension, 
+  languageDisplayNames, 
+  useCodeHighlighter
+} from "@/components/highlight"
 
 export default function WritePage() {
   const [title, setTitle] = useState("")
@@ -94,7 +21,6 @@ export default function WritePage() {
   const [language, setLanguage] = useState("javascript")
   const [lineNumbers, setLineNumbers] = useState<string[]>(["1"])
   const [fileName, setFileName] = useState<string | null>(null)
-  const [highlightedCode, setHighlightedCode] = useState("")
   const [isZipMode, setIsZipMode] = useState(false)
   const [fileTree, setFileTree] = useState<FileNode | null>(null)
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null)
@@ -104,6 +30,7 @@ export default function WritePage() {
   const previewRef = useRef<HTMLPreElement>(null)
   const titleInputRef = useRef<HTMLTextAreaElement>(null)
   const codePreviewRef = useRef<HTMLDivElement>(null)
+  const highlightedCode = useCodeHighlighter(code, language)
 
   const getDescriptionFromCode = () => {
     if (!code) return ""
@@ -370,15 +297,6 @@ export default function WritePage() {
     const lines = code.split("\n")
     const numbers = Array.from({ length: Math.max(lines.length, 1) }, (_, i) => (i + 1).toString())
     setLineNumbers(numbers)
-
-    try {
-      const hljsLanguage = getHighlightJsLanguage(language)
-      const highlighted = hljs.highlight(code, { language: hljsLanguage }).value
-      setHighlightedCode(highlighted)
-    } catch (error) {
-      console.error("Highlighting error:", error)
-      setHighlightedCode(code)
-    }
 
     if (isZipMode && selectedFile) {
       selectedFile.content = code
