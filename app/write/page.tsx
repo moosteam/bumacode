@@ -8,6 +8,8 @@ import JSZip from "jszip"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import FileViewer from "@/components/file-viewer"
 import Header from "@/components/layout/header"
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github.css'
 
 const detectLanguage = (code: string): string => {
   if (code.includes("import React") || code.includes("useState") || code.includes("function") || code.includes("=>")) {
@@ -72,46 +74,18 @@ const languageDisplayNames: Record<string, string> = {
   rust: "Rust",
 }
 
-const highlightCode = (code: string, language: string): string => {
-  if (!code) return ""
-
-  let highlighted = code
-
-  if (language === "javascript") {
-    highlighted = highlighted.replace(
-      /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|async|await)\b/g,
-      '<span class="text-yellow-500">$1</span>',
-    )
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="text-green-500">$1$2$1</span>')
-    highlighted = highlighted.replace(/\/\/(.*)/g, '<span class="text-gray-500">//$1</span>')
-  } else if (language === "typescript") {
-    highlighted = highlighted.replace(
-      /\b(const|let|var|function|return|if|else|for|while|class|interface|type|import|export|from|async|await)\b/g,
-      '<span class="text-blue-500">$1</span>',
-    )
-    highlighted = highlighted.replace(
-      /\b(string|number|boolean|any|void|null|undefined)\b/g,
-      '<span class="text-purple-400">$1</span>',
-    )
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="text-green-500">$1$2$1</span>')
-    highlighted = highlighted.replace(/\/\/(.*)/g, '<span class="text-gray-500">//$1</span>')
-  } else if (language === "python") {
-    highlighted = highlighted.replace(
-      /\b(def|class|if|else|elif|for|while|import|from|return|True|False|None)\b/g,
-      '<span class="text-green-500">$1</span>',
-    )
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="text-yellow-500">$1$2$1</span>')
-    highlighted = highlighted.replace(/#(.*)/g, '<span class="text-gray-500">#$1</span>')
-  } else if (language === "java") {
-    highlighted = highlighted.replace(
-      /\b(public|private|protected|class|interface|extends|implements|return|if|else|for|while|new|static|void)\b/g,
-      '<span class="text-red-500">$1</span>',
-    )
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="text-green-500">$1$2$1</span>')
-    highlighted = highlighted.replace(/\/\/(.*)/g, '<span class="text-gray-500">//$1</span>')
+const getHighlightJsLanguage = (language: string): string => {
+  const languageMap: Record<string, string> = {
+    javascript: "javascript",
+    typescript: "typescript",
+    python: "python",
+    java: "java",
+    csharp: "csharp",
+    cpp: "cpp",
+    go: "go",
+    rust: "rust",
   }
-
-  return highlighted
+  return languageMap[language] || "plaintext"
 }
 
 export default function WritePage() {
@@ -129,6 +103,7 @@ export default function WritePage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const previewRef = useRef<HTMLPreElement>(null)
   const titleInputRef = useRef<HTMLTextAreaElement>(null)
+  const codePreviewRef = useRef<HTMLDivElement>(null)
 
   const getDescriptionFromCode = () => {
     if (!code) return ""
@@ -379,6 +354,11 @@ export default function WritePage() {
       previewRef.current.scrollTop = e.currentTarget.scrollTop
       previewRef.current.scrollLeft = e.currentTarget.scrollLeft
     }
+    
+    if (codePreviewRef.current) {
+      codePreviewRef.current.scrollTop = e.currentTarget.scrollTop
+      codePreviewRef.current.scrollLeft = e.currentTarget.scrollLeft
+    }
   }
 
   useEffect(() => {
@@ -391,7 +371,14 @@ export default function WritePage() {
     const numbers = Array.from({ length: Math.max(lines.length, 1) }, (_, i) => (i + 1).toString())
     setLineNumbers(numbers)
 
-    setHighlightedCode(highlightCode(code, language))
+    try {
+      const hljsLanguage = getHighlightJsLanguage(language)
+      const highlighted = hljs.highlight(code, { language: hljsLanguage }).value
+      setHighlightedCode(highlighted)
+    } catch (error) {
+      console.error("Highlighting error:", error)
+      setHighlightedCode(code)
+    }
 
     if (isZipMode && selectedFile) {
       selectedFile.content = code
@@ -409,7 +396,6 @@ export default function WritePage() {
     setCode(node.content || "")
   }
 
-  // 제목 입력 필드 자동 높이 조절
   useEffect(() => {
     if (titleInputRef.current) {
       titleInputRef.current.style.height = "auto"
@@ -490,12 +476,17 @@ export default function WritePage() {
                       onChange={(e) => setCode(e.target.value)}
                       onKeyDown={handleTabKey}
                       onScroll={handleScroll}
-                      className="p-4 font-mono text-sm resize-none w-full h-full min-h-[300px] outline-none bg-white text-gray-800"
+                      className="p-4 font-mono text-sm resize-none w-full h-full min-h-[300px] outline-none bg-transparent text-transparent caret-gray-800 absolute top-0 left-0 z-10"
                       placeholder="여기에 코드를 입력하세요..."
                       spellCheck="false"
                       autoCapitalize="off"
                       autoComplete="off"
                       autoCorrect="off"
+                    />
+                    <div 
+                      ref={codePreviewRef}
+                      className="p-4 font-mono text-sm w-full h-full min-h-[300px] whitespace-pre overflow-auto bg-white"
+                      dangerouslySetInnerHTML={{ __html: highlightedCode || "<span class='text-gray-400'>여기에 코드를 입력하세요...</span>" }}
                     />
                   </div>
                 </div>
@@ -513,4 +504,3 @@ export default function WritePage() {
     </main>
   )
 }
-
