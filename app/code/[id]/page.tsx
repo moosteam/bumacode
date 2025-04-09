@@ -100,7 +100,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   if (!snippet) {
     return (
       <div className="max-w-4xl mx-auto p-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">코드를 찾을 수 없습니다</h1>
+        <h1 className="text-2xl font-bold mb-2">코드를 찾을 수 없습니다</h1>
         <Link href="/" className="text-blue-500 hover:underline">
           홈으로 돌아가기
         </Link>
