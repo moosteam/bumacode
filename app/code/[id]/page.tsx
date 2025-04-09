@@ -1,15 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import React from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Folder } from "lucide-react"
-import CodeViewer from "@/components/code-viewer"
-import { downloadCode, getRelativeTime, languageColors } from "@/utils/code-utils"
+import { ArrowLeft, Download, Folder, Copy, Check } from "lucide-react"
+import hljs from "highlight.js"
+import "highlight.js/styles/github.css"
+
 import Header from "@/components/layout/header"
 import useFileTree from "@/hooks/use-file-tree"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import FileViewer from "@/components/file-viewer"
-import React from "react"
+import { downloadCode, getRelativeTime, languageColors as globalLanguageColors } from "@/utils/code-utils"
 
 const codeSnippets = [
   {
@@ -20,39 +22,33 @@ const codeSnippets = [
     createdAt: "2023-11-15T12:30:00Z",
     code: `import { useState, useEffect } from 'react';
 
-// 로컬 스토리지를 사용하는 커스텀 훅 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
-// 상태 초기화
-const [storedValue, setStoredValue] = useState<T>(() => {
-  if (typeof window === "undefined") {
-    return initialValue;
-  }
-  
-  try {
-    // 로컬 스토리지를 사용하는 코드
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : initialValue;
-  } catch (error) {
-    console.error(error);
-    return initialValue;
-  }
-});
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
+    }
 
-// 값이 변경될 때마다 로컬 스토리지 업데이트
-useEffect(() => {
-  if (typeof window !== "undefined") {
     try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error(error);
+      return initialValue;
     }
-  }
-}, [key, storedValue]);
+  });
 
-return [storedValue, setStoredValue];
-}
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(storedValue));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, [key, storedValue]);
 
-`
+  return [storedValue, setStoredValue];
+}`,
   },
   {
     id: 2,
@@ -88,10 +84,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
 
   const handleDownloadCode = () => {
     const filename = snippet?.title
-      ? snippet.title
-          .replace(/[^\w\s]/gi, "")
-          .replace(/\s+/g, "_")
-          .toLowerCase()
+      ? snippet.title.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_").toLowerCase()
       : "code_snippet"
 
     if (snippet) {
@@ -128,7 +121,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
 
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className={`${languageColors[snippet.language] || "text-blue-500"}`}>{snippet.language}</span>
+            <span className={`${globalLanguageColors[snippet.language] || "text-blue-500"}`}>{snippet.language}</span>
             <span className="text-gray-500 text-xs">{relativeTime}</span>
           </div>
 
@@ -165,6 +158,103 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
             <CodeViewer code={snippet.code} language={snippet.language} onDownload={handleDownloadCode} />
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function CodeViewer({
+  code,
+  language,
+  title,
+  onDownload,
+}: {
+  code: string
+  language: string
+  title?: string
+  onDownload?: () => void
+}) {
+  const [copied, setCopied] = useState(false)
+  const [highlightedCode, setHighlightedCode] = useState("")
+  const codeRef = useRef<HTMLDivElement>(null)
+
+  const lineNumbers = code.split("\n").map((_, i) => (i + 1).toString())
+
+  useEffect(() => {
+    try {
+      const highlighted = hljs.highlight(code, { language: language.toLowerCase() }).value
+      setHighlightedCode(highlighted)
+    } catch (error) {
+      console.error("Highlighting error:", error)
+      setHighlightedCode(code)
+    }
+  }, [code, language])
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const languageColors: Record<string, string> = {
+    JavaScript: "text-yellow-500",
+    TypeScript: "text-blue-500",
+    Java: "text-red-500",
+    Python: "text-green-500",
+    "C#": "text-purple-500",
+    "C++": "text-pink-500",
+    Go: "text-cyan-500",
+    Rust: "text-orange-500",
+    Dart: "text-teal-500",
+  }
+
+  const languageColor = languageColors[language] || "text-blue-500"
+
+  return (
+    <div className="border rounded-lg overflow-hidden bg-gray-50">
+      <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+        <div className="flex items-center">
+          {title && <span className="mr-2">{title}</span>}
+          <span className={`font-medium ${languageColor}`}>{language}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          {onDownload && (
+            <button
+              className="text-sm flex items-center gap-1 text-blue-500 hover:text-blue-700"
+              onClick={onDownload}
+            >
+              <Download size={16} />
+              <span>다운로드</span>
+            </button>
+          )}
+          <button
+            className="text-sm flex items-center gap-1 text-blue-500 hover:text-blue-700"
+            onClick={handleCopyCode}
+          >
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+            <span>{copied ? "복사됨" : "복사하기"}</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex w-full">
+        <div className="bg-gray-100 text-gray-500 px-3 py-4 text-right select-none font-mono text-sm leading-relaxed">
+          {lineNumbers.map((num, i) => (
+            <div key={i}>{num}</div>
+          ))}
+        </div>
+
+        <div className="bg-white px-3 py-4 overflow-x-auto w-full font-mono text-sm leading-relaxed">
+          <pre className="m-0">
+            <code
+              ref={codeRef}
+              className={`language-${language.toLowerCase()}`}
+              dangerouslySetInnerHTML={{
+                __html: highlightedCode || "<span class='text-gray-400'>코드가 없습니다</span>",
+              }}
+            />
+          </pre>
+        </div>
       </div>
     </div>
   )
