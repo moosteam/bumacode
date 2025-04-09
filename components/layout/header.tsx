@@ -83,7 +83,7 @@ export default function Header() {
                 className="object-contain"
               />
             </Link>
-            <Link href="/" className="text-xl font-bold text-black ml-1">
+            <Link href="/" className="text-xl font-bold text-black ml-1 whitespace-nowrap">
               딸깍
             </Link>
           </div>
@@ -100,7 +100,7 @@ export default function Header() {
             </Link>
 
             <div
-              className="flex items-center gap-2 text-sm cursor-pointer"
+              className="hidden lg:flex items-center gap-2 text-sm cursor-pointer"
               onClick={handleIpClick}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-4">
