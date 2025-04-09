@@ -122,7 +122,7 @@ export default function CodeHighlighter({ code, language }: CodeHighlighterProps
     <div 
       className="font-mono text-sm w-full h-full whitespace-pre overflow-auto bg-white"
       dangerouslySetInnerHTML={{ 
-        __html: highlightedCode || "<span class='text-gray-400'>코드가 없습니다</span>" 
+        __html: highlightedCode || "<span class='text-gray-400'></span>" 
       }}
     />
   )

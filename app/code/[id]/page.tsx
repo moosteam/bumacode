@@ -10,7 +10,6 @@ import "highlight.js/styles/github.css"
 import Header from "@/components/layout/header"
 import useFileTree from "@/hooks/use-file-tree"
 import FileTree, { type FileNode } from "@/components/file-tree"
-import FileViewer from "@/components/file-viewer"
 import { downloadCode, getRelativeTime, languageColors as globalLanguageColors } from "@/utils/code-utils"
 
 const codeSnippets = [
@@ -147,10 +146,6 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
               <div className="w-1/3 border-r overflow-y-auto bg-gray-50 hide-scrollbar">
                 <FileTree root={fileTree} onSelectFile={handleSelectFile} />
               </div>
-
-              <div className="w-2/3 overflow-hidden">
-                <FileViewer file={selectedFile} />
-              </div>
             </div>
           </div>
         ) : (
@@ -250,7 +245,7 @@ function CodeViewer({
               ref={codeRef}
               className={`language-${language.toLowerCase()}`}
               dangerouslySetInnerHTML={{
-                __html: highlightedCode || "<span class='text-gray-400'>코드가 없습니다</span>",
+                __html: highlightedCode || "<span class='text-gray-700'>코드가 존재하지 않습니다:(</span>",
               }}
             />
           </pre>
