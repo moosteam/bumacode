@@ -11,6 +11,7 @@ import Header from "@/components/layout/header"
 import useFileTree from "@/hooks/use-file-tree"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import { downloadCode, getRelativeTime, languageColors as globalLanguageColors } from "@/utils/code-utils"
+import NoCode from "@/components/nocode"
 
 const codeSnippets = [
   {
@@ -96,16 +97,8 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const handleSelectFile = (node: FileNode) => {
     setSelectedFile(node)
   }
-
   if (!snippet) {
-    return (
-      <div className="max-w-4xl mx-auto p-8 text-center">
-        <h1 className="text-2xl font-bold mb-2">코드를 찾을 수 없습니다</h1>
-        <Link href="/" className="text-blue-500 hover:underline">
-          홈으로 돌아가기
-        </Link>
-      </div>
-    )
+    return <NoCode />
   }
 
   return (
