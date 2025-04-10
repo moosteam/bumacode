@@ -11,7 +11,8 @@ import CodeHighlighter, {
   detectLanguageFromExtension,  
   languageDisplayNames 
 } from "@/components/highlight" 
-import CodeInput from "@/components/code" 
+import CodeInput from "@/components/write-code" 
+import WriteButton from "@/components/ui/wirte-button" 
 
 export default function WritePage() { 
   const [title, setTitle] = useState("") 
@@ -241,8 +242,7 @@ export default function WritePage() {
     } 
   }, [code, language, fileName, isZipMode, selectedFile, fileTree]) 
 
-  const handleSubmit = (e: React.FormEvent) => { 
-    e.preventDefault() 
+  const handleSubmit = () => { 
     const description = getDescriptionFromCode() 
     
     if (isZipMode) {
@@ -380,9 +380,7 @@ export default function WritePage() {
           </div> 
 
           <div className="flex justify-end"> 
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"> 
-              공유하기 
-            </button> 
+            <WriteButton onClick={handleSubmit} />
           </div> 
         </form> 
       </div> 
