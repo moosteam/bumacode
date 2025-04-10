@@ -4,27 +4,26 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react" 
 import { Upload } from "lucide-react" 
 import JSZip from "jszip" 
+import Editor from "@monaco-editor/react"
 import FileTree, { type FileNode } from "@/components/file-tree" 
 import Header from "@/components/layout/header" 
-import CodeHighlighter, {  
+import {  
   detectLanguage,  
   detectLanguageFromExtension,  
   languageDisplayNames 
 } from "@/components/highlight" 
-import CodeInput from "@/components/write-code" 
 import WriteButton from "@/components/ui/wirte-button" 
 
 export default function WritePage() { 
   const [title, setTitle] = useState("") 
   const [code, setCode] = useState("") 
   const [language, setLanguage] = useState("javascript") 
-  const [lineNumbers, setLineNumbers] = useState<string[]>(["1"]) 
   const [fileName, setFileName] = useState<string | null>(null) 
   const [isZipMode, setIsZipMode] = useState(false) 
   const [fileTree, setFileTree] = useState<FileNode | null>(null) 
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null) 
   const [originalZipFile, setOriginalZipFile] = useState<File | Blob | null>(null) 
-  const codeEditorRef = useRef<HTMLTextAreaElement>(null) as React.RefObject<HTMLTextAreaElement>
+  const editorRef = useRef<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null) 
   const titleInputRef = useRef<HTMLTextAreaElement>(null) 
 
@@ -38,22 +37,9 @@ export default function WritePage() {
       .replace(/\*\/\s*$/, "") 
   } 
 
-  const handleTabKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => { 
-    if (e.key === "Tab") { 
-      e.preventDefault() 
-      const start = e.currentTarget.selectionStart 
-      const end = e.currentTarget.selectionEnd 
-
-      const newCode = code.substring(0, start) + "  " + code.substring(end) 
-      setCode(newCode) 
-
-      setTimeout(() => { 
-        if (codeEditorRef.current) { 
-          codeEditorRef.current.selectionStart = codeEditorRef.current.selectionEnd = start + 2 
-        } 
-      }, 0) 
-    } 
-  } 
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor
+  }
 
   const createFileTree = async (zip: JSZip): Promise<FileNode> => { 
     const root: FileNode = { 
@@ -115,7 +101,7 @@ export default function WritePage() {
       if (!current.children) current.children = [] 
       let found = current.children.find((child) => child.name === part) 
       if (!found) { 
-        const newPath = current.path ? `<span class="math-inline">\{current\.path\}/</span>{part}` : part 
+        const newPath = current.path ? `${current.path}/${part}` : part 
         const newNode: FileNode = { name: part, path: newPath, type: "directory", children: [] } 
         current.children.push(newNode) 
         found = newNode 
@@ -136,7 +122,7 @@ export default function WritePage() {
       if (!current.children) current.children = [] 
       let found = current.children.find((child) => child.name === part) 
       if (!found) { 
-        const newPath = current.path ? `<span class="math-inline">\{current\.path\}/</span>{part}` : part 
+        const newPath = current.path ? `${current.path}/${part}` : part 
         const newNode: FileNode = { name: part, path: newPath, type: "directory", children: [] } 
         current.children.push(newNode) 
         found = newNode 
@@ -146,7 +132,7 @@ export default function WritePage() {
     if (!current.children) current.children = [] 
     let fileNode = current.children.find((child) => child.name === fileName) 
     if (!fileNode) { 
-      const filePath = current.path ? `<span class="math-inline">\{current\.path\}/</span>{fileName}` : fileName 
+      const filePath = current.path ? `${current.path}/${fileName}` : fileName 
       fileNode = { name: fileName, path: filePath, type: "file" } 
       current.children.push(fileNode) 
     } 
@@ -209,18 +195,11 @@ export default function WritePage() {
     fileInputRef.current?.click() 
   } 
 
-  const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
-  }
-
   useEffect(() => { 
     if (!fileName && !isZipMode && code) { 
       const detectedLang = detectLanguage(code) 
       setLanguage(detectedLang) 
     } 
-
-    const lines = code.split("\n") 
-    const numbers = Array.from({ length: Math.max(lines.length, 1) }, (_, i) => (i + 1).toString()) 
-    setLineNumbers(numbers) 
 
     if (isZipMode && selectedFile && selectedFile.content !== code) { 
        const updateContentInTree = (node: FileNode): boolean => {
@@ -267,6 +246,53 @@ export default function WritePage() {
       titleInputRef.current.style.height = `${titleInputRef.current.scrollHeight}px` 
     } 
   }, [title]) 
+
+  const handleCodeChange = (value: string | undefined) => {
+    setCode(value || '')
+  }
+
+  const getMonacoLanguage = (lang: string) => {
+    const monacoLangMap: Record<string, string> = {
+      'javascript': 'javascript',
+      'typescript': 'typescript',
+      'python': 'python',
+      'java': 'java',
+      'csharp': 'csharp',
+      'cpp': 'cpp',
+      'c': 'cpp',
+      'html': 'html',
+      'css': 'css',
+      'json': 'json',
+      'markdown': 'markdown',
+      'go': 'go',
+      'rust': 'rust',
+      'xml': 'xml',
+      'yaml': 'yaml',
+    }
+    return monacoLangMap[lang] || 'plaintext'
+  }
+
+  const editorOptions = {
+    fontSize: 14,
+    minimap: { enabled: true },
+    scrollBeyondLastLine: false,
+    automaticLayout: true,
+    lineNumbers: "on",
+    scrollbar: {
+      vertical: "visible",
+      horizontal: "visible",
+    },
+    wordWrap: "on",
+    wrappingIndent: "same",
+    semanticHighlighting: false,
+    formatOnPaste: true,
+    formatOnType: true,
+    renderValidationDecorations: "off",
+    snippetSuggestions: "none",
+    suggest: { 
+      snippetsPreventQuickSuggestions: true 
+    },
+  }
 
   return ( 
     <main className="min-h-screen bg-white"> 
@@ -325,40 +351,26 @@ export default function WritePage() {
                   </div> 
                 </div> 
 
-                <div className="flex h-[600px]">
-                  <div className="w-1/3 border-r overflow-y-auto bg-gray-50 hide-scrollbar p-2"> 
+                <div className="flex h-[700px]">
+                  <div className="w-1/4 border-r overflow-y-auto bg-gray-50 hide-scrollbar p-2"> 
                     {fileTree && <FileTree root={fileTree} onSelectFile={handleSelectFile} />} 
                   </div> 
 
-                  <div className="w-2/3 flex flex-col overflow-hidden"> 
+                  <div className="w-3/4 flex flex-col overflow-hidden"> 
                     {selectedFile ? (
-                        <>
-                          <div className="flex border-b">
-                              <div className="bg-gray-100 text-gray-500 p-4 text-right select-none font-mono text-sm sticky top-0 z-20"> 
-                                {lineNumbers.map((num, i) => ( 
-                                  <div key={i}>{num}</div> 
-                                ))} 
-                              </div> 
-                                <div className="relative flex-grow h-full">
-                                  <textarea 
-                                    ref={codeEditorRef} 
-                                    value={code} 
-                                    onChange={(e) => setCode(e.target.value)} 
-                                    onKeyDown={handleTabKey} 
-                                    onScroll={handleScroll} 
-                                    className="p-4 font-mono text-sm resize-none w-full h-full outline-none bg-transparent text-transparent caret-gray-800 absolute top-0 left-0 z-10" 
-                                    placeholder="코드를 편집하세요..." 
-                                    spellCheck="false" 
-                                    autoCapitalize="off" 
-                                    autoComplete="off" 
-                                    autoCorrect="off" 
-                                  />
-                                <div className="p-4 h-full overflow-auto">
-                                   <CodeHighlighter code={code} language={language} /> 
-                               </div>
-                              </div>
-                          </div>
-                        </>
+                        <div className="h-full w-full">
+                          <Editor
+                            height="700px"
+                            width="100%"
+                            defaultLanguage="javascript"
+                            language={getMonacoLanguage(language)}
+                            value={code}
+                            onChange={handleCodeChange}
+                            onMount={handleEditorDidMount}
+                            options={editorOptions}
+                            className="w-full"
+                          />
+                        </div>
                     ) : (
                         <div className="flex-grow flex items-center justify-center text-gray-500">
                             표시할 파일을 선택하세요.
@@ -368,14 +380,19 @@ export default function WritePage() {
                 </div> 
               </div> 
             ) : ( 
-              <CodeInput 
-                code={code} 
-                setCode={setCode} 
-                lineNumbers={lineNumbers} 
-                handleTabKey={handleTabKey} 
-                handleScroll={handleScroll} 
-                codeEditorRef={codeEditorRef} 
-              />
+              <div className="border rounded-lg overflow-hidden bg-gray-50">
+                <Editor
+                  height="500px"
+                  width="100%"
+                  defaultLanguage="javascript"
+                  language={getMonacoLanguage(language)}
+                  value={code}
+                  onChange={handleCodeChange}
+                  onMount={handleEditorDidMount}
+                  options={editorOptions}
+                  className="w-full"
+                />
+              </div>
             )} 
           </div> 
 
