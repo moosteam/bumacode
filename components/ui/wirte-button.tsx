@@ -9,7 +9,7 @@ const WriteButton: React.FC<WriteButtonProps> = ({ onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className="px-6 py-2 bg-blue-600 text-white rounded-md"
+      className="px-6 py-2 bg-blue-600 text-white rounded-md MT-4"
     >
       공유하기
     </button>

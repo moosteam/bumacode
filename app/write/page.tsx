@@ -4,7 +4,7 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Upload } from "lucide-react";
 import JSZip from "jszip";
-import Editor from "@monaco-editor/react";
+import dynamic from 'next/dynamic';
 import FileTree, { type FileNode } from "@/components/file-tree";
 import Header from "@/components/layout/header";
 import {
@@ -13,6 +13,11 @@ import {
   languageDisplayNames
 } from "@/components/highlight";
 import WriteButton from "@/components/ui/wirte-button";
+
+const Editor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+  loading: () => null
+});
 
 export default function WritePage() {
   const [title, setTitle] = useState("");
@@ -23,6 +28,8 @@ export default function WritePage() {
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [originalZipFile, setOriginalZipFile] = useState<File | Blob | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editorReady, setEditorReady] = useState(false);
   const editorRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
@@ -39,6 +46,7 @@ export default function WritePage() {
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
+    setEditorReady(true);
   };
 
   const createFileTree = async (zip: JSZip): Promise<FileNode> => {
@@ -136,6 +144,7 @@ export default function WritePage() {
 
     setFileName(file.name);
     setTitle(file.name.split(".").slice(0, -1).join("."));
+    setIsLoading(true);
 
     if (file.name.toLowerCase().endsWith(".zip")) {
       try {
@@ -154,6 +163,8 @@ export default function WritePage() {
       } catch (error) {
         console.error("ZIP 파일 처리 중 오류:", error);
         alert("ZIP 파일을 처리하는 중 오류가 발생했습니다.");
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setIsZipMode(false);
@@ -166,6 +177,7 @@ export default function WritePage() {
       reader.onload = (event) => {
         const content = event.target?.result as string;
         setCode(content);
+        setIsLoading(false);
       };
       reader.readAsText(file);
     }
@@ -262,7 +274,86 @@ export default function WritePage() {
     suggest: {
       snippetsPreventQuickSuggestions: true
     },
-    padding: { top: 10, bottom: 10 }
+  };
+
+  // 렌더링 컨테이너 - 자리를 항상 유지
+  const renderEditorContainer = () => {
+    const zipHeight = "700px";
+    const singleHeight = "410px";
+    
+    if (isZipMode) {
+      return (
+        <div className="rounded-lg overflow-hidden" style={{ height: zipHeight }}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <h1 className="text-2xl font-bold">잠시만 기다려주세요...</h1>
+            </div>
+          ) : (
+            <>
+              <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+                <div className="text-sm font-medium flex items-center">
+                  <span>{fileTree?.name !== "root" ? fileTree?.name : "파일 탐색기"}</span>
+                </div>
+              </div>
+
+              <div className="flex" style={{ height: "calc(100% - 40px)" }}>
+                <div className="w-1/4 border-r overflow-y-auto bg-gray-50 hide-scrollbar p-2">
+                  {fileTree && <FileTree root={fileTree} onSelectFile={handleSelectFile} />}
+                </div>
+
+                <div className="w-3/4 flex flex-col overflow-hidden ml-[-20px]">
+                  {selectedFile ? (
+                    <div className="h-full w-full">
+                      <Editor
+                        height="100%"
+                        width="100%"
+                        defaultLanguage="javascript"
+                        language={language}
+                        value={code}
+                        onChange={handleCodeChange}
+                        onMount={handleEditorDidMount}
+                        options={editorOptions}
+                        loading={null}
+                        className="w-full bg-transparent"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-grow flex items-center justify-center text-gray-500">
+                      표시할 파일을 선택하세요.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div className="rounded-lg overflow-hidden" style={{ height: singleHeight }}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <h1 className="text-2xl font-bold">잠시만 기다려주세요...</h1>
+            </div>
+          ) : (
+            <div className="h-full ml-[-20px]">
+              <Editor
+                height="100%"
+                width="100%"
+                defaultLanguage="javascript"
+                language={language}
+                value={code}
+                onChange={handleCodeChange}
+                onMount={handleEditorDidMount}
+                options={editorOptions}
+                loading={null}
+                className="w-full bg-transparent"
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
   };
 
   return (
@@ -287,25 +378,8 @@ export default function WritePage() {
           </div>
 
           <div className="mb-4">
-            <div className="flex justify-end items-center mb-1">
-              <div className="flex items-center gap-2">
-                {!isZipMode && (
-                  <span className="text-sm text-gray-500">
-                    {languageDisplayNames[language] ||
-                      language.charAt(0).toUpperCase() + language.slice(1)}
-                  </span>
-                )}
-                {isZipMode && selectedFile && (
-                  <span
-                    className="text-sm text-gray-500 truncate max-w-[200px]"
-                    title={selectedFile.path}
-                  >
-                    {selectedFile.name} (
-                    {languageDisplayNames[language] ||
-                      language.charAt(0).toUpperCase() + language.slice(1)}
-                    )
-                  </span>
-                )}
+            <div className="flex justify-end items-center mb-8 mt-[-30]" style={{ marginTop: "-34px" }}>
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={handleUploadClick}
@@ -324,65 +398,7 @@ export default function WritePage() {
               </div>
             </div>
 
-            {isZipMode ? (
-              <div className="rounded-lg overflow-hidden bg-gray-50"> 
-                <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
-                  <div className="text-sm font-medium flex items-center">
-                    <span>{fileTree?.name !== "root" ? fileTree?.name : "파일 탐색기"}</span>
-                  </div>
-                </div>
-
-                <div className="flex h-[700px]">
-                  <div className="w-1/4 border-r overflow-y-auto bg-gray-50 hide-scrollbar p-2">
-                    {fileTree && <FileTree root={fileTree} onSelectFile={handleSelectFile} />}
-                  </div>
-
-                  <div className="w-3/4 flex flex-col overflow-hidden ml-[-20px]">
-                    {selectedFile ? (
-                      <div className="h-full w-full">
-                        <Editor
-                          height="700px"
-                          width="100%"
-                          defaultLanguage="javascript"
-                          value={code}
-                          onChange={handleCodeChange}
-                          onMount={handleEditorDidMount}
-                          options={editorOptions}
-                          loading={
-                            <div className="p-4">
-                              <div className="animate-pulse bg-gray-300 h-8 rounded"></div>
-                            </div>
-                          }
-                          className="w-full"
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex-grow flex items-center justify-center text-gray-500">
-                        표시할 파일을 선택하세요.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-lg overflow-hidden bg-gray-50 ml-[-20px]">
-                <Editor
-                  height="410px"
-                  width="100%"
-                  defaultLanguage="javascript"
-                  value={code}
-                  onChange={handleCodeChange}
-                  onMount={handleEditorDidMount}
-                  options={editorOptions}
-                  loading={
-                    <div className="p-4">
-                      <div className="animate-pulse bg-gray-300 h-8 rounded"></div>
-                    </div>
-                  }
-                  className="w-full"
-                />
-              </div>
-            )}
+            {renderEditorContainer()}
           </div>
 
           <div className="flex justify-end">
