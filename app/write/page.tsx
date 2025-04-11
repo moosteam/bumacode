@@ -158,7 +158,6 @@ export default function WritePage() {
         if (firstFile) {
           setSelectedFile(firstFile);
           setCode(firstFile.content || "");
-          setLanguage(firstFile.language || "javascript");
         }
       } catch (error) {
         console.error("ZIP 파일 처리 중 오류:", error);
@@ -292,7 +291,7 @@ export default function WritePage() {
             <>
               <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
                 <div className="text-sm font-medium flex items-center">
-                  <span>{fileTree?.name !== "root" ? fileTree?.name : "파일 탐색기"}</span>
+                  <span>{fileTree?.name !== "root" ? fileTree?.name : "코드"}</span>
                 </div>
               </div>
 
@@ -307,7 +306,6 @@ export default function WritePage() {
                       <Editor
                         height="100%"
                         width="100%"
-                        defaultLanguage="javascript"
                         language={language}
                         value={code}
                         onChange={handleCodeChange}
