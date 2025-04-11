@@ -123,14 +123,13 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <Link href="/" className="flex items-center text-blue-500 mb-6">
+        <Link href="/" className="flex items-center text-blue-500 mb-2">
           <ArrowLeft size={16} className="mr-1" />
           <span>목록으로 돌아가기</span>
         </Link>
 
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            {/* 언어 표시 부분 제거 */}
             <span className="text-gray-500 text-xs">{relativeTime}</span>
           </div>
 
@@ -138,14 +137,14 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
         </div>
 
         {id === 7 ? (
-          <div className="border rounded-lg overflow-hidden bg-gray-50">
-            <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+          <div className="border rounded-lg overflow-hidden bg-white">
+            <div className="bg-white px-4 py-2 border-b flex justify-between items-center">
               <div className="text-sm font-medium flex items-center">
                 <Folder size={16} className="mr-2" />
                 <span>코드</span>
               </div>
               {handleDownloadZip && (
-                <button onClick={handleDownloadZip} className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-700">
+                <button onClick={handleDownloadZip} className="flex items-center gap-1 text-sm text-black">
                   <Download size={14} />
                   <span>ZIP 다운로드</span>
                 </button>
@@ -153,7 +152,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
             </div>
 
             <div className="flex h-[500px]">
-              <div className="w-1/3 border-r overflow-y-auto bg-gray-50 hide-scrollbar">
+              <div className="w-1/3 border-r overflow-y-auto bg-white hide-scrollbar">
                 <FileTree root={fileTree} onSelectFile={handleSelectFile} />
               </div>
               
@@ -201,8 +200,6 @@ function CodeViewer({
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
     setEditorReady(true);
-    
-    // Disable the editor
     editor.updateOptions({ 
       readOnly: true,
       domReadOnly: true,
@@ -250,9 +247,9 @@ function CodeViewer({
   const monacoLanguage = language.toLowerCase();
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-gray-50">
-      <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
-        <div className="flex items-center">
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="bg-white px-4 py-2 border-b flex justify-between items-center">
+        <div className="flex items-center text-sm">
           {title && <span className="mr-2">{title}</span>}
           <span className={`font-medium ${languageColor}`}>{language}</span>
         </div>
@@ -278,7 +275,7 @@ function CodeViewer({
           options={editorOptions}
           loading={
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-500">에디터 로딩 중...</div>
+              <div className="text-gray-500">뷰어 로딩 중...</div>
             </div>
           }
         />
