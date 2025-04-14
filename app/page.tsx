@@ -21,7 +21,6 @@ export type Snippet = {
 
 export const codeSnippetsAtom = atomWithStorage<Snippet[]>("codeSnippets", []);
 
-// 스켈레톤 아이템 컴포넌트
 const SkeletonItem = () => {
   return (
     <div className="pt-3 pb-3 animate-pulse">
@@ -40,8 +39,8 @@ const SkeletonItem = () => {
 export default function Home() {
   const [category, setCategory] = useState("전체");
   const [codeSnippets, setCodeSnippets] = useAtom(codeSnippetsAtom);
-  const [loading, setLoading] = useState(true); // 초기값을 true로 설정
-  const [dataFetched, setDataFetched] = useState(false); // 데이터 페치 완료 여부 상태 추가
+  const [loading, setLoading] = useState(true);
+  const [dataFetched, setDataFetched] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -52,7 +51,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // 항상 로딩 상태로 시작
     const fetchSnippets = async () => {
       setLoading(true);
       try {
@@ -65,16 +63,15 @@ export default function Home() {
           deleteAfter: item.deleteAfter || "5분 후 삭제",
         }));
         setCodeSnippets(transformedItems);
-        setDataFetched(true); // 데이터 페치 완료 표시
+        setDataFetched(true);
       } catch (error) {
         console.error("Failed to fetch snippets: ", error);
-        setDataFetched(true); // 에러가 있어도 페치 시도는 완료
+        setDataFetched(true);
       } finally {
         setLoading(false);
       }
     };
 
-    // 초기 데이터 로드가 되지 않았거나 코드 스니펫이 비어있는 경우
     if (!dataFetched || codeSnippets.length === 0) {
       fetchSnippets();
     }
@@ -103,7 +100,6 @@ export default function Home() {
     return segments.slice(0, 2).join(".");
   };
 
-  // 스켈레톤 UI 배열 생성
   const skeletonItems = Array(5).fill(0).map((_, index) => (
     <SkeletonItem key={`skeleton-${index}`} />
   ));
@@ -122,7 +118,7 @@ export default function Home() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="block appearance-none w-full bg-gray-50 border border-gray-300 text-gray-700 py-1 px-2.5 rounded-md text-sm font-medium pr-8"
-                disabled={loading} // 로딩 중일 때 비활성화
+                disabled={loading}
               >
                 <option value="전체">전체</option>
                 <option value="ZIP 파일">ZIP 파일</option>
