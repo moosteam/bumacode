@@ -1,87 +1,101 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import GuideSection from "@/components/guide"
-import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
-import { useState } from "react"
+import Link from "next/link";
+import GuideSection from "@/components/guide";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
+import { useState, useEffect } from "react";
+import { atomWithStorage } from "jotai/utils";
+import { useAtom } from "jotai";
+
+export type Snippet = {
+  id: number;
+  title: string;
+  filePath: string;
+  userIp: string;
+  createdAt: string;
+  type?: string;
+  language?: string;
+  deleteAfter?: string;
+};
+
+export const codeSnippetsAtom = atomWithStorage<Snippet[]>("codeSnippets", []);
 
 export default function Home() {
-  const [category, setCategory] = useState("전체")
+  const [category, setCategory] = useState("전체");
+  const [codeSnippets, setCodeSnippets] = useAtom(codeSnippetsAtom);
+  const [loading, setLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const codeSnippets = [
-    {
-      id: 1,
-      title: "React 커스텀 훅: useLocalStorage",
-      language: "TypeScript",
-      createdAt: "2023-11-15T12:30:00Z",
-      deleteAfter: "5분 후 삭제",
-      type: "코드",
-    },
-    {
-      id: 2,
-      title: "Spring Boot JWT 인증 구현 예제",
-      language: "Java",
-      createdAt: "2023-11-12T09:15:00Z",
-      deleteAfter: "8분 후 삭제",
-      type: "ZIP 파일",
-    },
-    {
-      id: 3,
-      title: "Flutter 무한 스크롤 구현하기",
-      language: "Dart",
-      createdAt: "2023-11-10T14:45:00Z",
-      deleteAfter: "16분 후 삭제",
-      type: "코드",
-    },
-    {
-      id: 4,
-      title: "Node.js Express 미들웨어 작성법",
-      language: "JavaScript",
-      createdAt: "2023-11-08T08:20:00Z",
-      deleteAfter: "10분 후 삭제",
-      type: "코드",
-    },
-    {
-      id: 5,
-      title: "Python 데이터 분석 스크립트",
-      language: "Python",
-      createdAt: "2023-11-05T16:10:00Z",
-      deleteAfter: "20분 후 삭제",
-      type: "파일 및 이미지",
-    },
-    {
-      id: 6,
-      title: "Vue.js 컴포넌트 통신 예제",
-      language: "JavaScript",
-      createdAt: "2023-11-03T11:30:00Z",
-      deleteAfter: "1분 후 삭제",
-      type: "코드",
-    },
-    {
-      id: 7,
-      title: "Spring Boot 프로젝트 구조",
-      language: "Java",
-      createdAt: "2023-11-01T14:30:00Z",
-      deleteAfter: "15분 후 삭제",
-      type: "ZIP 파일",
-    },
-  ]
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(intervalId);
+  }, []);
 
-  const parseDeleteAfter = (text: string) => {
-    const match = text.match(/(\d+)/)
-    return match ? parseInt(match[1], 10) : 0
-  }
+  useEffect(() => {
+    if (codeSnippets.length === 0) {
+      const fetchSnippets = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/write-get`);
+          const data = await res.json();
+          const transformedItems = data.items.map((item: Snippet) => ({
+            ...item,
+            type: item.type || "코드",
+            language: item.language || "JavaScript",
+            deleteAfter: item.deleteAfter || "5분 후 삭제",
+          }));
+          setCodeSnippets(transformedItems);
+        } catch (error) {
+          console.error("Failed to fetch snippets: ", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSnippets();
+    }
+  }, [codeSnippets, setCodeSnippets]);
 
-  const filteredSnippets = (category === "전체"
-    ? codeSnippets
-    : codeSnippets.filter((snippet) => snippet.type === category)
-  ).sort((a, b) => parseDeleteAfter(b.deleteAfter) - parseDeleteAfter(a.deleteAfter))
+  const parseCreatedAt = (createdAt: string): Date => {
+    const cleaned = createdAt.replace(/\./g, "-").replace(/\s+/g, " ").trim();
+    const parts = cleaned.split(" ");
+    if (parts.length >= 2) {
+      return new Date(parts[0] + "T" + parts[1]);
+    }
+    return new Date(createdAt);
+  };
+
+  const calculateMinutesLeft = (createdAt: string): number => {
+    const createdDate = parseCreatedAt(createdAt);
+    const expirationMs = 20 * 60 * 1000;
+    const elapsedMs = currentTime.getTime() - createdDate.getTime();
+    const remainingMs = expirationMs - elapsedMs;
+    return remainingMs > 0 ? Math.ceil(remainingMs / 60000) : 0;
+  };
+
+  const filteredSnippets = codeSnippets.filter((snippet) => {
+    if (calculateMinutesLeft(snippet.createdAt) <= 0) {
+      return false;
+    }
+    if (category === "전체") return true;
+    return snippet.type === category;
+  });
+
+  const sortedSnippets = filteredSnippets.sort((a, b) => {
+    return calculateMinutesLeft(b.createdAt) - calculateMinutesLeft(a.createdAt);
+  });
+
+  const displayUserIp = (ip: string) => {
+    const segments = ip.split(".");
+    return segments.slice(0, 2).join(".");
+  };
 
   return (
-    <main className="min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="flex-grow max-w-6xl mx-auto px-4 py-6 w-full">
         <GuideSection />
 
         <div className="mb-6">
@@ -117,46 +131,53 @@ export default function Home() {
             </div>
           </h2>
 
-          <div className="divide-y divide-gray-200">
-            {filteredSnippets.map((snippet) => (
-              <div key={snippet.id} className="pt-3 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs">192.10.⚹⚹⚹.⚹⚹</span>
-                  <span className="text-gray-500 text-xs">{snippet.deleteAfter}</span>
-                </div>
+          {loading ? (
+            <div className="text-center py-4">
+              <p>로딩 중...</p>
+            </div>
+          ) : sortedSnippets.length === 0 ? (
+            <div className="text-center py-4">
+              <p>※ 등록된 코드가 없습니다.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {sortedSnippets.map((snippet) => {
+                const minutesLeft = calculateMinutesLeft(snippet.createdAt);
+                return (
+                  <div key={snippet.id} className="pt-3 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 text-xs">
+                        {displayUserIp(snippet.userIp)}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        {minutesLeft}분 후 삭제
+                      </span>
+                    </div>
 
-                <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
-                  <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
-                  <span
-                    className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${
-                      snippet.type === "코드"
-                        ? "text-yellow-600 bg-yellow-50"
-                        : snippet.type === "ZIP 파일"
-                        ? "text-green-600 bg-green-50"
-                        : snippet.type === "파일 및 이미지"
-                        ? "text-blue-600 bg-blue-50"
-                        : ""
-                    }`}
-                  >
-                    {snippet.type}
-                  </span>
-                </h2>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-center mt-8">
-          <div className="inline-flex space-x-1">
-            <button className="px-3 py-1 bg-blue-500 text-white rounded-md">1</button>
-            <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">2</button>
-            <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">3</button>
-            <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">4</button>
-            <button className="px-3 py-1 text-gray-600 hover:bg-gray-200 rounded-md">5</button>
-          </div>
+                    <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
+                      <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
+                      <span
+                        className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${
+                          snippet.type === "코드"
+                            ? "text-yellow-600 bg-yellow-50"
+                            : snippet.type === "ZIP 파일"
+                            ? "text-green-600 bg-green-50"
+                            : snippet.type === "파일 및 이미지"
+                            ? "text-blue-600 bg-blue-50"
+                            : ""
+                        }`}
+                      >
+                        {snippet.type}
+                      </span>
+                    </h2>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
       <Footer />
-    </main>
-  )
+    </div>
+  );
 }
