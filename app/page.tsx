@@ -7,6 +7,7 @@ import Footer from "@/components/layout/footer";
 import { useState, useEffect } from "react";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
+import { Loader2 } from "lucide-react"; // Added the Loader2 import
 
 export type Snippet = {
   id: number;
@@ -67,24 +68,13 @@ export default function Home() {
     return new Date(createdAt);
   };
 
-  const calculateMinutesLeft = (createdAt: string): number => {
-    const createdDate = parseCreatedAt(createdAt);
-    const expirationMs = 20 * 60 * 1000;
-    const elapsedMs = currentTime.getTime() - createdDate.getTime();
-    const remainingMs = expirationMs - elapsedMs;
-    return remainingMs > 0 ? Math.ceil(remainingMs / 60000) : 0;
-  };
-
   const filteredSnippets = codeSnippets.filter((snippet) => {
-    if (calculateMinutesLeft(snippet.createdAt) <= 0) {
-      return false;
-    }
     if (category === "전체") return true;
     return snippet.type === category;
   });
 
   const sortedSnippets = filteredSnippets.sort((a, b) => {
-    return calculateMinutesLeft(b.createdAt) - calculateMinutesLeft(a.createdAt);
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   const displayUserIp = (ip: string) => {
@@ -132,7 +122,8 @@ export default function Home() {
           </h2>
 
           {loading ? (
-            <div className="text-center py-4">
+            <div className="text-center py-4 flex items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin" />
               <p>로딩 중...</p>
             </div>
           ) : sortedSnippets.length === 0 ? (
@@ -142,7 +133,6 @@ export default function Home() {
           ) : (
             <div className="divide-y divide-gray-200">
               {sortedSnippets.map((snippet) => {
-                const minutesLeft = calculateMinutesLeft(snippet.createdAt);
                 return (
                   <div key={snippet.id} className="pt-3 pb-3">
                     <div className="flex items-center gap-2">
@@ -150,7 +140,7 @@ export default function Home() {
                         {displayUserIp(snippet.userIp)}
                       </span>
                       <span className="text-gray-500 text-xs">
-                        {minutesLeft}분 후 삭제
+                        {snippet.deleteAfter}
                       </span>
                     </div>
 
