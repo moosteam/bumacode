@@ -58,6 +58,7 @@ export default function Home() {
         const data = await res.json();
         const transformedItems = data.items.map((item: Snippet) => ({
           ...item,
+          // 만약 item.type이 존재하지 않으면 "코드"로 기본값 설정
           type: item.type || "코드",
           language: item.language || "JavaScript",
           deleteAfter: item.deleteAfter || "5분 후 삭제",
@@ -100,9 +101,9 @@ export default function Home() {
     return segments.slice(0, 2).join(".");
   };
 
-  const skeletonItems = Array(5).fill(0).map((_, index) => (
-    <SkeletonItem key={`skeleton-${index}`} />
-  ));
+  const skeletonItems = Array(5)
+    .fill(0)
+    .map((_, index) => <SkeletonItem key={`skeleton-${index}`} />);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -145,9 +146,7 @@ export default function Home() {
           </h2>
 
           {loading ? (
-            <div className="divide-y divide-gray-200">
-              {skeletonItems}
-            </div>
+            <div className="divide-y divide-gray-200">{skeletonItems}</div>
           ) : sortedSnippets.length === 0 ? (
             <div className="text-center py-4">
               <p>※ 등록된 코드가 없습니다.</p>
@@ -155,6 +154,21 @@ export default function Home() {
           ) : (
             <div className="divide-y divide-gray-200">
               {sortedSnippets.map((snippet) => {
+                // type 값에 따른 스타일과 텍스트 결정
+                let typeText = snippet.type;
+                let typeClasses = "";
+                if (snippet.type === "file") {
+                  typeText = "파일 및 코드";
+                  // 기존 코드와 동일한 노란색 테마 유지
+                  typeClasses = "text-yellow-600 bg-yellow-50";
+                } else if (snippet.type === "zip") {
+                  typeText = "zip";
+                  typeClasses = "text-green-600 bg-green-50";
+                } else if (snippet.type === "코드") {
+                  typeClasses = "text-yellow-600 bg-yellow-50";
+                } else if (snippet.type === "파일 및 이미지") {
+                  typeClasses = "text-blue-600 bg-blue-50";
+                }
                 return (
                   <div key={snippet.id} className="pt-3 pb-3">
                     <div className="flex items-center gap-2">
@@ -168,18 +182,8 @@ export default function Home() {
 
                     <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
                       <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
-                      <span
-                        className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${
-                          snippet.type === "코드"
-                            ? "text-yellow-600 bg-yellow-50"
-                            : snippet.type === "ZIP 파일"
-                            ? "text-green-600 bg-green-50"
-                            : snippet.type === "파일 및 이미지"
-                            ? "text-blue-600 bg-blue-50"
-                            : ""
-                        }`}
-                      >
-                        {snippet.type}
+                      <span className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${typeClasses}`}>
+                        {typeText}
                       </span>
                     </h2>
                   </div>
