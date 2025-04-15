@@ -173,7 +173,7 @@ export default function Home() {
                     </div>
 
                     <h2 className="text-base font-semibold text-gray-800 transition-colors hover:text-blue-600 flex items-center">
-                      <Link href={`/code/${snippet.id}`}>{snippet.title}</Link>
+                      <Link href={`/code/${snippet.id}`}>{snippet.title}  </Link>
                       <span className={`ml-3 px-2 py-1 text-xs rounded-md font-normal ${typeClasses}`}>
                         {typeText}
                       </span>

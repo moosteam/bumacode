@@ -43,72 +43,74 @@ function DetailSkeleton() {
   )
 }
 
+// 파일 단일 뷰 스켈레톤 UI - 완전히 수정된 버전
 function FileCodeViewerSkeleton() {
-  const lineWidths = [75, 85, 65, 90, 70, 80, 95, 75, 85, 70, 80, 75, 85, 65, 70, 90];
-  
   return (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+    <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
+      {/* 상단 헤더 */}
+      <div 
+        className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
+        style={{ height: '40px' }}
+      >
         <div className="flex items-center">
-          <FileCode size={16} className="mr-2 text-gray-500" />
-          <div className="h-5 bg-gray-300 rounded w-32 animate-pulse mr-3"></div>
-          <div className="h-4 bg-gray-300 rounded w-40 animate-pulse"></div>
+          <div className="h-4 w-4 bg-gray-300 rounded mr-2 animate-pulse"></div>
+          {/* 파일 확장자 자리 표시자 */}
+          <div className="h-4 bg-gray-300 rounded w-8 animate-pulse mr-3"></div>
+          {/* 추가 정보 자리 표시자 - 정확한 높이와 세로 중앙 정렬 */}
+          <div className="h-4 bg-gray-300 rounded w-44 animate-pulse"></div>
         </div>
-        <div className="flex items-center">
-          <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
+        <div className="flex items-center space-x-2">
+          {/* 버튼 영역 - 실제 버튼 모양과 유사하게 */}
+          <div className="flex space-x-2">
+            <div className="h-6 bg-gray-300 rounded-md w-14 animate-pulse"></div>
+            <div className="h-6 bg-gray-300 rounded-md w-14 animate-pulse"></div>
+          </div>
         </div>
       </div>
-      <div className="h-[calc(60vh-120px)] bg-white border-t">
-        <div className="h-full p-3">
-          {lineWidths.map((width, i) => (
-            <div 
-              key={i}
-              className="flex items-center mb-1"
-            >
-              <div className="text-xs text-gray-400 w-10 text-right pr-3">
-                {i + 1}
-              </div>
-              <div 
-                className="h-5 bg-gray-100 rounded flex-1 animate-pulse"
-                style={{ width: `${width}%` }}
-              ></div>
-            </div>
-          ))}
-        </div>
+      {/* 코드 영역 - 전체 큰 네모로 처리 */}
+      <div className="h-full bg-white p-3" style={{height: 'calc(100% - 40px)'}}>
+        <div className="h-full bg-gray-200 rounded animate-pulse"></div>
       </div>
     </div>
   )
 }
 
+// ZIP 파일 스켈레톤 UI - 완전히 수정된 버전
 function ZipCodeViewerSkeleton() {
-  const folderWidths = [60, 55, 70, 65, 50, 75, 60, 55];
-  const codeWidths = [80, 85, 70, 75, 90, 65, 75, 80, 70, 85, 75, 90, 65, 80];
-  
   return (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+    <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
+      {/* 상단 헤더 */}
+      <div 
+        className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
+        style={{ height: '40px' }}
+      >
         <div className="flex items-center">
-          <Folder size={16} className="mr-2 text-gray-500" />
-          <div className="h-5 bg-gray-300 rounded w-16 animate-pulse mr-3"></div>
+          <div className="h-4 w-4 bg-gray-300 rounded mr-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-300 rounded w-8 animate-pulse mr-3"></div>
           <div className="h-4 bg-gray-300 rounded w-16 animate-pulse"></div>
         </div>
-        <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
+        <div className="flex items-center">
+          {/* ZIP 다운로드 버튼 */}
+          <div className="h-6 bg-gray-300 rounded-md w-24 animate-pulse"></div>
+        </div>
       </div>
-      <div className="flex h-[calc(60vh-120px)]">
-        <div className="w-1/4 border-r bg-white p-3">
-          {folderWidths.map((width, i) => (
+      {/* 본문 영역 */}
+      <div className="flex" style={{ height: 'calc(100% - 40px)' }}>
+        {/* 왼쪽 파일 트리 영역 */}
+        <div className="w-1/5 border-r bg-white p-3" style={{ borderRight: '0.5px solid #E5E5E5' }}>
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="mb-3">
               <div 
                 className="h-4 bg-gray-200 rounded mb-2 animate-pulse"
-                style={{ width: `${width}%` }}
+                style={{ width: `${60 + (i % 3) * 5}%` }}
               ></div>
               {i % 2 === 0 && (
                 <div className="pl-4">
-                  {[...Array(2)].map((_, j) => (
+                  {Array.from({ length: 2 }).map((_, j) => (
                     <div 
-                      key={j} 
+                      key={j}
                       className="h-3 bg-gray-200 rounded mb-2 animate-pulse"
-                      style={{ width: `${width - 10}%` }}
+                      style={{ width: `${50 + (j % 2) * 10}%` }}
                     ></div>
                   ))}
                 </div>
@@ -116,32 +118,26 @@ function ZipCodeViewerSkeleton() {
             </div>
           ))}
         </div>
-        <div className="w-3/4 bg-white">
-          <div className="bg-gray-100 px-3 py-2 border-b flex justify-between items-center">
+        {/* 오른쪽 코드 뷰 영역 */}
+        <div className="w-4/5" style={{ paddingLeft: '2px' }}>
+          {/* 코드 뷰어 상단 헤더 */}
+          <div 
+            className="bg-gray-100 px-3 py-2 border-b flex justify-between items-center"
+            style={{ height: '40px' }}
+          >
             <div className="flex items-center">
-              <FileCode size={16} className="mr-2 text-gray-500" />
-              <div className="h-4 bg-gray-300 rounded w-32 animate-pulse mr-3"></div>
-              <div className="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+              <div className="h-4 w-4 bg-gray-300 rounded mr-2 animate-pulse"></div>
+              <div className="h-4 bg-gray-300 rounded w-20 animate-pulse mr-3"></div>
+              <div className="h-4 bg-gray-300 rounded w-44 animate-pulse"></div>
             </div>
-            <div className="flex items-center">
-              <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
+            <div className="flex items-center space-x-2">
+              <div className="h-6 bg-gray-300 rounded-md w-14 animate-pulse"></div>
+              <div className="h-6 bg-gray-300 rounded-md w-24 animate-pulse"></div>
             </div>
           </div>
-          <div className="h-[calc(60vh-180px)] bg-white border-t p-3">
-            {codeWidths.map((width, i) => (
-              <div 
-                key={i}
-                className="flex items-center mb-1"
-              >
-                <div className="text-xs text-gray-400 w-10 text-right pr-3">
-                  {i + 1}
-                </div>
-                <div 
-                  className="h-5 bg-gray-100 rounded flex-1 animate-pulse"
-                  style={{ width: `${width}%` }}
-                ></div>
-              </div>
-            ))}
+          {/* 코드 영역 - 전체 큰 네모로 처리 */}
+          <div className="h-full border-t p-3" style={{ height: 'calc(100% - 40px)' }}>
+            <div className="h-full bg-gray-200 rounded animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -326,17 +322,26 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
               <div className="mb-6">
                 <h1 className="text-3xl font-bold">{snippet.title}</h1>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-gray-500 text-sm">{relativeTime} 10분 뒤에 이 코드가 삭제돼요.</span>
+                  <span className="text-gray-500 text-sm">
+                    {relativeTime} {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))} 등록 · 18분 후 삭제
+                  </span>
                 </div>
               </div>
               
               {isZip ? (
                 <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
-                  <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
+                  <div 
+                    className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
+                    style={{ height: '40px' }}
+                  >
                     <div className="flex items-center h-full">
                       <Folder size={16} className="mr-2 text-gray-500" />
                       <span className="font-semibold text-sm">코드</span>
-                      {!selectedFile && <span className="ml-4 text-gray-500 text-xs">{formatFileSize(fileSize)}</span>}
+                      {!selectedFile && (
+                        <span className="ml-4 text-gray-500 text-xs">
+                          {formatFileSize(fileSize)}
+                        </span>
+                      )}
                       {selectedFile && selectedFile.type === "file" && (
                         <span className="ml-4 flex items-center">
                           <span className="text-black font-medium text-xs">{selectedFile.name}</span>
@@ -347,22 +352,28 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                     <div className="flex items-center">
                       <div className="text-xs flex items-center">
                         {selectedFile && selectedFile.type === "file" && (
-                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                                  onClick={handleZipCopyCode}>
+                          <button 
+                            className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                            onClick={handleZipCopyCode}
+                          >
                             {zipCopied ? <Check size={14} className="text-gray-600" /> : <Copy size={14} />}
                             <span>{zipCopied ? "복사됨" : "복사"}</span>
                           </button>
                         )}
                         {selectedFile && selectedFile.type === "file" && (
-                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                                  onClick={handleDownloadFile}>
+                          <button 
+                            className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                            onClick={handleDownloadFile}
+                          >
                             <Download size={14} />
                             <span>파일 다운로드</span>
                           </button>
                         )}
                         {handleDownloadZip && (
-                          <button onClick={handleDownloadZip} 
-                                  className="flex items-center gap-1.5 text-gray-600 bg-gray-100 px-3 py-1.5 rounded-md transition-colors">
+                          <button 
+                            onClick={handleDownloadZip}
+                            className="flex items-center gap-1.5 text-gray-600 bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                          >
                             <Download size={14} />
                             <span>ZIP 다운로드</span>
                           </button>
@@ -394,7 +405,10 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
               ) : (
                 <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
-                  <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
+                  <div 
+                    className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
+                    style={{ height: '40px' }}
+                  >
                     <div className="flex items-center">
                       <FileCode size={16} className="mr-2 text-gray-500" />
                       <span className="font-semibold text-sm">
@@ -405,23 +419,20 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <div className="text-xs flex items-center space-x-0">
+                      <div className="text-xs flex items-center space-x-2">
                         {openRawCode && (
-                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                                  onClick={openRawCode}>
+                          <button 
+                            className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                            onClick={openRawCode}
+                          >
                             <ExternalLink size={14} />
-                            <span>Raw</span>  
+                            <span>Raw</span>
                           </button>
                         )}
                         <button 
-                          className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                          onClick={() => {
-                            if (snippet && snippet.code) {
-                              navigator.clipboard.writeText(snippet.code);
-                              setCopied(true);
-                              setTimeout(() => setCopied(false), 2000);
-                            }
-                          }}>
+                          className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                          onClick={handleCopyCode}
+                        >
                           {copied ? <Check size={14} className="text-gray-600" /> : <Copy size={14} />}
                           <span>{copied ? "복사됨" : "복사"}</span>
                         </button>
