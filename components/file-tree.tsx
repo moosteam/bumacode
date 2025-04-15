@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Folder, FolderOpen, File, ChevronRight, ChevronDown } from "lucide-react"
 
 export interface FileNode {
+  length: number
   name: string
   path: string
   type: "file" | "directory"
