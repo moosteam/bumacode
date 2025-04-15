@@ -397,7 +397,10 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                   <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
                     <div className="flex items-center">
                       <FileCode size={16} className="mr-2 text-gray-500" />
-                      <span className="text-xs text-gray-600">
+                      <span className="font-semibold text-sm">
+                        {snippet.filePath ? snippet.filePath.split('.').pop()?.toLowerCase() || 'txt' : 'txt'}
+                      </span>
+                      <span className="ml-4 text-xs text-gray-600">
                         {lineCount} Lines ({snippet.code?.split('\n').filter(line => line.trim().length > 0).length} sloc) · {formatFileSize(fileSize)}
                       </span>
                     </div>
