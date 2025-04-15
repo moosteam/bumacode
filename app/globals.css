@@ -2,6 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .code-viewer-container {
+    @apply h-[calc(60vh-120px)];
+  }
+  
+  @screen sm {
+    .code-viewer-container {
+      @apply h-[calc(70vh-100px)];
+    }
+  }
+  
+  @screen md {
+    .code-viewer-container {
+      @apply h-[calc(75vh-100px)];
+    }
+  }
+  
+  @screen lg {
+    .code-viewer-container {
+      @apply h-[calc(80vh-100px)];
+    }
+  }
+}
+
+/* 글로벌 스크롤바 스타일 - 모든 스크롤바에 적용 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+
+.monaco-scrollable-element > .scrollbar > .slider {
+  background: transparent !important;
+  border-radius: 3px !important;
+  width: 6px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.monaco-scrollable-element:hover > .scrollbar > .slider {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
 body {
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
     "Apple SD Gothic Neo", sans-serif;
@@ -202,4 +282,3 @@ pre[class*="language-"] {
 .token.entity {
   cursor: help;
 }
-

@@ -58,7 +58,7 @@ function FileCodeViewerSkeleton() {
           <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
         </div>
       </div>
-      <div className="h-[420px] bg-white border-t">
+      <div className="h-[calc(60vh-120px)] bg-white border-t">
         <div className="h-full p-3">
           {lineWidths.map((width, i) => (
             <div 
@@ -94,7 +94,7 @@ function ZipCodeViewerSkeleton() {
         </div>
         <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
       </div>
-      <div className="flex h-[420px]">
+      <div className="flex h-[calc(60vh-120px)]">
         <div className="w-1/4 border-r bg-white p-3">
           {folderWidths.map((width, i) => (
             <div key={i} className="mb-3">
@@ -127,7 +127,7 @@ function ZipCodeViewerSkeleton() {
               <div className="h-7 bg-gray-300 rounded w-56 animate-pulse"></div>
             </div>
           </div>
-          <div className="h-[340px] bg-white border-t p-3">
+          <div className="h-[calc(60vh-180px)] bg-white border-t p-3">
             {codeWidths.map((width, i) => (
               <div 
                 key={i}
@@ -233,39 +233,6 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     }
   }, [snippet, isZip, setOriginalZipFile, loadExampleZip])
 
-  useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-      ::-webkit-scrollbar {
-        width: 6px !important;
-        height: 6px !important;
-      }
-      ::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2) !important;
-        border-radius: 2px !important;
-      }
-      ::-webkit-scrollbar-track {
-        background-color: transparent !important;
-      }
-      
-      * {
-        scrollbar-width: thin !important;
-        scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
-      }
-      
-      .monaco-scrollable-element > .scrollbar > .slider {
-        background: rgba(0, 0, 0, 0.2) !important;
-        border-radius: 2px !important;
-        width: 6px !important;
-      }
-    `;
-    document.head.appendChild(styleElement);
-    
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
-
   const handleDownloadCode = () => {
     const filename = snippet?.title
       ? snippet.title.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_").toLowerCase()
@@ -325,101 +292,104 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const selectedFileSlocCount = selectedFileContent.split('\n').filter(line => line.trim().length > 0).length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {!snippet || loading ? (
-          <>
-            <DetailSkeleton />
-            {isZip ? <ZipCodeViewerSkeleton /> : <FileCodeViewerSkeleton />}
-          </>
-        ) : (
-          <>
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold">{snippet.title}</h1>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-gray-500 text-sm">{relativeTime} - 5분 후 삭제</span>
+      <main className="flex-grow">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          {!snippet || loading ? (
+            <>
+              <DetailSkeleton />
+              {isZip ? <ZipCodeViewerSkeleton /> : <FileCodeViewerSkeleton />}
+            </>
+          ) : (
+            <>
+              <div className="mb-6">
+                <h1 className="text-3xl font-bold">{snippet.title}</h1>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-gray-500 text-sm">{relativeTime} 5분 후 삭제</span>
+                </div>
               </div>
-            </div>
-            
-            {isZip ? (
-              <div className="border rounded-lg overflow-hidden bg-white">
-                <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
-                  <div className="flex items-center h-full">
-                    <Folder size={16} className="mr-2 text-gray-500" />
-                    <span className="font-semibold text-sm">코드</span>
-                    {!selectedFile && <span className="ml-4 text-gray-500 text-xs">{formatFileSize(fileSize)}</span>}
-                    {selectedFile && selectedFile.type === "file" && (
-                      <span className="ml-4 flex items-center">
-                        <span className="text-black font-medium text-xs">{selectedFile.name}</span>
-                        <span className="text-gray-500 text-xs"> · {lineCount} 줄 ({selectedFileSlocCount} sloc) · {formatFileSize(fileSize)}</span>
-                      </span>
-                    )}
+              
+              {isZip ? (
+                <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
+                  <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
+                    <div className="flex items-center h-full">
+                      <Folder size={16} className="mr-2 text-gray-500" />
+                      <span className="font-semibold text-sm">코드</span>
+                      {!selectedFile && <span className="ml-4 text-gray-500 text-xs">{formatFileSize(fileSize)}</span>}
+                      {selectedFile && selectedFile.type === "file" && (
+                        <span className="ml-4 flex items-center">
+                          <span className="text-black font-medium text-xs">{selectedFile.name}</span>
+                          <span className="text-gray-500 text-xs">  · {lineCount} 줄 ({selectedFileSlocCount} sloc) · {formatFileSize(fileSize)}</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center">
+                      <div className="text-xs flex items-center">
+                        {selectedFile && selectedFile.type === "file" && (
+                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                                  onClick={handleZipCopyCode}>
+                            {zipCopied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                            <span>{zipCopied ? "복사됨" : "복사"}</span>
+                          </button>
+                        )}
+                        {selectedFile && selectedFile.type === "file" && (
+                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                                  onClick={handleDownloadFile}>
+                            <Download size={14} />
+                            <span>파일 다운로드</span>
+                          </button>
+                        )}
+                        {handleDownloadZip && (
+                          <button onClick={handleDownloadZip} 
+                                  className="flex items-center gap-1.5 text-gray-600 bg-gray-100 px-3 py-1.5 rounded-md transition-colors">
+                            <Download size={14} />
+                            <span>ZIP 다운로드</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <div className="text-xs border border-gray-300 rounded-md bg-white flex">
-                      {selectedFile && selectedFile.type === "file" && (
-                        <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1 border-r border-gray-300" 
-                                onClick={handleZipCopyCode}>
-                          {zipCopied ? <Check size={12} /> : <Copy size={12} />}
-                          <span>{zipCopied ? "복사됨" : "복사"}</span>
-                        </button>
-                      )}
-                      {selectedFile && selectedFile.type === "file" && (
-                        <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1 border-r border-gray-300" 
-                                onClick={handleDownloadFile}>
-                          <Download size={12} />
-                          <span>다운로드</span>
-                        </button>
-                      )}
-                      {handleDownloadZip && (
-                        <button onClick={handleDownloadZip} className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1">
-                          <Download size={12} />
-                          <span>ZIP 다운로드</span>
-                        </button>
+                  <div className="flex h-full" style={{ height: 'calc(100% - 40px)' }}>
+                    <div className="w-1/4 border-r border-gray-50 overflow-y-auto bg-white custom-scrollbar">
+                      <FileTree root={fileTree} onSelectFile={handleSelectFile} />
+                    </div>
+                    <div className="w-3/4">
+                      {selectedFile && selectedFile.type === "file" ? (
+                        <CodeViewer
+                          code={selectedFileContent}
+                          language={selectedFileLanguage}
+                          lineCount={lineCount}
+                          fileSize={fileSize}
+                          onDownload={handleDownloadFile}
+                          showHeader={false}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-gray-500">
+                          표시할 파일을 선택하세요.
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="flex h-[420px]">
-                  <div className="w-1/4 border-r border-gray-50 overflow-y-auto bg-white hide-scrollbar">
-                    <FileTree root={fileTree} onSelectFile={handleSelectFile} />
-                  </div>
-                  <div className="w-3/4">
-                    {selectedFile && selectedFile.type === "file" ? (
-                      <CodeViewer
-                        code={selectedFileContent}
-                        language={selectedFileLanguage}
-                        lineCount={lineCount}
-                        fileSize={fileSize}
-                        onDownload={handleDownloadFile}
-                        showHeader={false}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        표시할 파일을 선택하세요.
-                      </div>
-                    )}
-                  </div>
+              ) : (
+                <div className="mb-6 code-viewer-container">
+                  <CodeViewer
+                    code={snippet.code || ""}
+                    language="plaintext"
+                    lineCount={lineCount}
+                    fileSize={fileSize}
+                    filePath={snippet.filePath}
+                    onDownload={handleDownloadCode}
+                    onOpenRaw={openRawCode}
+                    showHeader={true}
+                  />
                 </div>
-              </div>
-            ) : (
-              <div className="mb-6">
-                <CodeViewer
-                  code={snippet.code || ""}
-                  language="plaintext"
-                  lineCount={lineCount}
-                  fileSize={fileSize}
-                  filePath={snippet.filePath}
-                  onDownload={handleDownloadCode}
-                  onOpenRaw={openRawCode}
-                  showHeader={true}
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
       <Footer />
     </div>
   )
@@ -521,23 +491,23 @@ function CodeViewer({
             </span>
           </div>
           <div className="flex items-center">
-            <div className="text-xs border border-gray-300 rounded-md bg-white flex">
+            <div className="text-xs flex items-center space-x-0">
               {onOpenRaw && (
-                <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1 border-r border-gray-300" 
+                <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
                         onClick={onOpenRaw}>
-                  <ExternalLink size={12} />
+                  <ExternalLink size={14} />
                   <span>Raw</span>
                 </button>
               )}
-              <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1 border-r border-gray-300" 
+              <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
                       onClick={handleCopyCode}>
-                {copied ? <Check size={12} /> : <Copy size={12} />}
+                {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
                 <span>{copied ? "복사됨" : "복사"}</span>
               </button>
               {onDownload && (
-                <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 px-2 py-1" 
+                <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
                         onClick={onDownload}>
-                  <Download size={12} />
+                  <Download size={14} />
                   <span>다운로드</span>
                 </button>
               )}
@@ -546,7 +516,7 @@ function CodeViewer({
         </div>
       )}
       
-      <div className={`${showHeader ? 'h-[420px]' : 'h-[420px]'} border-t border-gray-300 bg-white`}>
+      <div className="h-full border-t border-gray-300 bg-white" style={{ height: showHeader ? 'calc(100% - 40px)' : '100%' }}>
         <div className="h-full bg-white" style={{ 
           backgroundColor: '#f6f8fa',
           borderLeft: '1px solid #d0d7de' 
