@@ -293,6 +293,17 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const handleZipCopyCode = () => {
     if (selectedFileContent) {
       navigator.clipboard.writeText(selectedFileContent);
+      const btn = document.activeElement as HTMLButtonElement;
+      if (btn) {
+        const span = btn.querySelector('span');
+        const icon = btn.querySelector('svg');
+        if (span && icon) {
+          icon.classList.add('text-gray-600');
+          setTimeout(() => {
+            icon.classList.remove('text-gray-600');
+          }, 2000);
+        }
+      }
       setZipCopied(true);
       setTimeout(() => setZipCopied(false), 2000);
     }
@@ -382,63 +393,49 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                   </div>
                 </div>
               ) : (
-                <div className="mb-6 code-viewer-container">
-                  <div className="border rounded-lg overflow-hidden bg-white">
-                    <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
-                      <div className="flex items-center">
-                        <FileCode size={16} className="mr-2 text-gray-500" />
-                        <span className="text-xs text-gray-600">
-                          {lineCount} Lines ({snippet.code?.split('\n').filter(line => line.trim().length > 0).length} sloc) · {formatFileSize(fileSize)}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="text-xs flex items-center space-x-0">
-                          {openRawCode && (
-                            <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                                    onClick={openRawCode}>
-                              <ExternalLink size={14} />
-                              <span>Raw</span>
-                            </button>
-                          )}
-                          <button 
-                            className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                            onClick={() => {
-                              if (snippet && snippet.code) {
-                                navigator.clipboard.writeText(snippet.code);
-                                const btn = document.activeElement as HTMLButtonElement;
-                                if (btn) {
-                                  const span = btn.querySelector('span');
-                                  const icon = btn.querySelector('svg');
-                                  if (span && icon) {
-                                    const originalContent = span.textContent;
-                                    span.textContent = '복사됨';
-                                    icon.classList.add('text-gray-600');
-                                    setTimeout(() => {
-                                      span.textContent = originalContent;
-                                      icon.classList.remove('text-gray-600');
-                                    }, 2000);
-                                  }
-                                }
-                              }
-                            }}>
-                            <Copy size={14} />
-                            <span>복사</span>
+                <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
+                  <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
+                    <div className="flex items-center">
+                      <FileCode size={16} className="mr-2 text-gray-500" />
+                      <span className="text-xs text-gray-600">
+                        {lineCount} Lines ({snippet.code?.split('\n').filter(line => line.trim().length > 0).length} sloc) · {formatFileSize(fileSize)}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="text-xs flex items-center space-x-0">
+                        {openRawCode && (
+                          <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                                  onClick={openRawCode}>
+                            <ExternalLink size={14} />
+                            <span>Raw</span>  
                           </button>
-                        </div>
+                        )}
+                        <button 
+                          className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                          onClick={() => {
+                            if (snippet && snippet.code) {
+                              navigator.clipboard.writeText(snippet.code);
+                              setCopied(true);
+                              setTimeout(() => setCopied(false), 2000);
+                            }
+                          }}>
+                          {copied ? <Check size={14} className="text-gray-600" /> : <Copy size={14} />}
+                          <span>{copied ? "복사됨" : "복사"}</span>
+                        </button>
                       </div>
                     </div>
-                    <div className="h-[calc(60vh-120px)] bg-white border-t">
-                      <CodeViewer
-                        code={snippet.code || ""}
-                        language="plaintext"
-                        lineCount={lineCount}
-                        fileSize={fileSize}
-                        filePath={snippet.filePath}
-                        onDownload={handleDownloadCode}
-                        onOpenRaw={openRawCode}
-                        showHeader={false}
-                      />
-                    </div>
+                  </div>
+                  <div className="h-full" style={{ height: 'calc(100% - 40px)' }}>
+                    <CodeViewer
+                      code={snippet.code || ""}
+                      language="plaintext"
+                      lineCount={lineCount}
+                      fileSize={fileSize}
+                      filePath={snippet.filePath}
+                      onDownload={handleDownloadCode}
+                      onOpenRaw={openRawCode}
+                      showHeader={false}
+                    />
                   </div>
                 </div>
               )}
