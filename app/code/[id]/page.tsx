@@ -155,6 +155,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const snippetId = Number.parseInt(id)
   const [snippet, setSnippet] = useState<Snippet | null>(null)
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
   const {
     fileTree,
     loadExampleZip,
@@ -254,6 +255,14 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     }
   }
 
+  const handleCopyCode = () => {
+    if (snippet && snippet.code) {
+      navigator.clipboard.writeText(snippet.code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   const relativeTime = snippet ? getRelativeTime(snippet.createdAt) : ""
 
   const handleSelectFile = async (node: FileNode) => {
@@ -320,7 +329,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                       {selectedFile && selectedFile.type === "file" && (
                         <span className="ml-4 flex items-center">
                           <span className="text-black font-medium text-xs">{selectedFile.name}</span>
-                          <span className="text-gray-500 text-xs">  · {lineCount} 줄 ({selectedFileSlocCount} sloc) · {formatFileSize(fileSize)}</span>
+                          <span className="text-gray-500 text-xs">  · {lineCount} Lines ({selectedFileSlocCount} sloc) · {formatFileSize(fileSize)}</span>
                         </span>
                       )}
                     </div>
@@ -329,7 +338,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                         {selectedFile && selectedFile.type === "file" && (
                           <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
                                   onClick={handleZipCopyCode}>
-                            {zipCopied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                            {zipCopied ? <Check size={14} className="text-gray-600" /> : <Copy size={14} />}
                             <span>{zipCopied ? "복사됨" : "복사"}</span>
                           </button>
                         )}
@@ -351,10 +360,10 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                   </div>
                   <div className="flex h-full" style={{ height: 'calc(100% - 40px)' }}>
-                    <div className="w-1/4 border-r border-gray-50 overflow-y-auto bg-white custom-scrollbar">
+                    <div className="w-1/5 overflow-y-auto bg-white custom-scrollbar" style={{ borderRight: '0.5px solid #E5E5E5' }}>
                       <FileTree root={fileTree} onSelectFile={handleSelectFile} />
                     </div>
-                    <div className="w-3/4">
+                    <div className="w-4/5" style={{ paddingLeft: '2px' }}>
                       {selectedFile && selectedFile.type === "file" ? (
                         <CodeViewer
                           code={selectedFileContent}
@@ -374,16 +383,63 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
               ) : (
                 <div className="mb-6 code-viewer-container">
-                  <CodeViewer
-                    code={snippet.code || ""}
-                    language="plaintext"
-                    lineCount={lineCount}
-                    fileSize={fileSize}
-                    filePath={snippet.filePath}
-                    onDownload={handleDownloadCode}
-                    onOpenRaw={openRawCode}
-                    showHeader={true}
-                  />
+                  <div className="border rounded-lg overflow-hidden bg-white">
+                    <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center" style={{ height: '40px' }}>
+                      <div className="flex items-center">
+                        <FileCode size={16} className="mr-2 text-gray-500" />
+                        <span className="text-xs text-gray-600">
+                          {lineCount} Lines ({snippet.code?.split('\n').filter(line => line.trim().length > 0).length} sloc) · {formatFileSize(fileSize)}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="text-xs flex items-center space-x-0">
+                          {openRawCode && (
+                            <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                                    onClick={openRawCode}>
+                              <ExternalLink size={14} />
+                              <span>Raw</span>
+                            </button>
+                          )}
+                          <button 
+                            className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
+                            onClick={() => {
+                              if (snippet && snippet.code) {
+                                navigator.clipboard.writeText(snippet.code);
+                                const btn = document.activeElement as HTMLButtonElement;
+                                if (btn) {
+                                  const span = btn.querySelector('span');
+                                  const icon = btn.querySelector('svg');
+                                  if (span && icon) {
+                                    const originalContent = span.textContent;
+                                    span.textContent = '복사됨';
+                                    icon.classList.add('text-gray-600');
+                                    setTimeout(() => {
+                                      span.textContent = originalContent;
+                                      icon.classList.remove('text-gray-600');
+                                    }, 2000);
+                                  }
+                                }
+                              }
+                            }}>
+                            <Copy size={14} />
+                            <span>복사</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-[calc(60vh-120px)] bg-white border-t">
+                      <CodeViewer
+                        code={snippet.code || ""}
+                        language="plaintext"
+                        lineCount={lineCount}
+                        fileSize={fileSize}
+                        filePath={snippet.filePath}
+                        onDownload={handleDownloadCode}
+                        onOpenRaw={openRawCode}
+                        showHeader={false}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </>
@@ -481,62 +537,21 @@ function CodeViewer({
   const monacoLanguage = language.toLowerCase() === 'plaintext' ? 'text' : language.toLowerCase();
 
   return (
-    <div className="border-0 overflow-hidden bg-white h-full">
-      {showHeader && (
-        <div className="bg-gray-100 border-b flex justify-between items-center p-2 px-3" style={{ height: '40px' }}>
-          <div className="flex items-center text-sm text-gray-700" style={{ paddingTop: '2px' }}>
-            <FileCode size={16} className="mr-2 text-gray-500" />
-            <span className="text-xs text-gray-600">
-              {lineCount} 줄 ({slocCount} sloc) · {formattedFileSize}
-            </span>
+    <div className="h-full bg-white">
+      <Editor
+        height="100%"
+        width="100%"
+        language={monacoLanguage}
+        value={code}
+        theme="vs"
+        onMount={handleEditorDidMount}
+        options={editorOptions}
+        loading={
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500">뷰어 로딩 중...</div>
           </div>
-          <div className="flex items-center">
-            <div className="text-xs flex items-center space-x-0">
-              {onOpenRaw && (
-                <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                        onClick={onOpenRaw}>
-                  <ExternalLink size={14} />
-                  <span>Raw</span>
-                </button>
-              )}
-              <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                      onClick={handleCopyCode}>
-                {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
-                <span>{copied ? "복사됨" : "복사"}</span>
-              </button>
-              {onDownload && (
-                <button className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors" 
-                        onClick={onDownload}>
-                  <Download size={14} />
-                  <span>다운로드</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <div className="h-full border-t border-gray-300 bg-white" style={{ height: showHeader ? 'calc(100% - 40px)' : '100%' }}>
-        <div className="h-full bg-white" style={{ 
-          backgroundColor: '#f6f8fa',
-          borderLeft: '1px solid #d0d7de' 
-        }}>
-          <Editor
-            height="100%"
-            width="100%"
-            language={monacoLanguage}
-            value={code}
-            theme="vs"
-            onMount={handleEditorDidMount}
-            options={editorOptions}
-            loading={
-              <div className="flex items-center justify-center h-full">
-                <div className="text-gray-500">뷰어 로딩 중...</div>
-              </div>
-            }
-          />
-        </div>
-      </div>
+        }
+      />
     </div>
   )
 }
