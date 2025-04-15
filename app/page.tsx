@@ -58,7 +58,6 @@ export default function Home() {
         const data = await res.json();
         const transformedItems = data.items.map((item: Snippet) => ({
           ...item,
-          // 만약 item.type이 존재하지 않으면 "코드"로 기본값 설정
           type: item.type || "코드",
           language: item.language || "JavaScript",
           deleteAfter: item.deleteAfter || "5분 후 삭제",
@@ -122,9 +121,8 @@ export default function Home() {
                 disabled={loading}
               >
                 <option value="전체">전체</option>
-                <option value="ZIP 파일">ZIP 파일</option>
-                <option value="파일 및 이미지">파일 및 이미지</option>
-                <option value="코드">코드</option>
+                <option value="zip">ZIP 파일</option>
+                <option value="file">파일 및 코드</option>
               </select>
               <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
                 <svg
@@ -154,20 +152,14 @@ export default function Home() {
           ) : (
             <div className="divide-y divide-gray-200">
               {sortedSnippets.map((snippet) => {
-                // type 값에 따른 스타일과 텍스트 결정
                 let typeText = snippet.type;
                 let typeClasses = "";
                 if (snippet.type === "file") {
                   typeText = "파일 및 코드";
-                  // 기존 코드와 동일한 노란색 테마 유지
                   typeClasses = "text-yellow-600 bg-yellow-50";
                 } else if (snippet.type === "zip") {
-                  typeText = "zip";
+                  typeText = "ZIP 파일";
                   typeClasses = "text-green-600 bg-green-50";
-                } else if (snippet.type === "코드") {
-                  typeClasses = "text-yellow-600 bg-yellow-50";
-                } else if (snippet.type === "파일 및 이미지") {
-                  typeClasses = "text-blue-600 bg-blue-50";
                 }
                 return (
                   <div key={snippet.id} className="pt-3 pb-3">
