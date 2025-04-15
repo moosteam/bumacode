@@ -37,9 +37,9 @@ export function FileTreeNode({ node, depth = 0, onSelectFile }: FileTreeNodeProp
   return (
     <div className="select-none">
       <div
-        className={`flex items-center py-1 px-2 hover:bg-gray-100 rounded cursor-pointer ${node.type === "file" ? "hover:text-blue-500" : ""}`}
+        className={`flex items-center py-1 mx-2 hover:bg-gray-100 rounded cursor-pointer ${node.type === "file" ? "hover:text-blue-500" : ""}`}
         onClick={node.type === "directory" ? toggleOpen : handleFileClick}
-        style={{ paddingLeft: `${depth * 16 + 8}px` }}
+        style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {node.type === "directory" &&
           (isOpen ? <ChevronDown size={16} className="mr-1" /> : <ChevronRight size={16} className="mr-1" />)}

@@ -306,7 +306,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
               <div className="mb-6">
                 <h1 className="text-3xl font-bold">{snippet.title}</h1>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-gray-500 text-sm">{relativeTime} 5분 후 삭제</span>
+                  <span className="text-gray-500 text-sm">{relativeTime} 10분 뒤에 이 코드가 삭제돼요.</span>
                 </div>
               </div>
               

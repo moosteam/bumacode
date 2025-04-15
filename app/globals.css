@@ -26,7 +26,6 @@
   }
 }
 
-/* 글로벌 스크롤바 스타일 - 모든 스크롤바에 적용 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

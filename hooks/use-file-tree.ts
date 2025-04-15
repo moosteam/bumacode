@@ -15,11 +15,12 @@ export default function useFileTree() {
     try {
       const zip = await JSZip.loadAsync(originalZipFile)
       setZipInstance(zip)
-      const tree: FileNode = { 
-        name: "/", 
-        path: "", 
-        type: "directory", 
-        children: [] 
+      const tree: FileNode = {
+        name: "/",
+        path: "",
+        type: "directory",
+        children: [],
+        length: 0
       }
       Object.keys(zip.files).forEach((filePath) => {
         const zipEntry = zip.files[filePath]
@@ -35,9 +36,12 @@ export default function useFileTree() {
               type: isFile ? "file" : "directory",
               children: isFile ? undefined : [],
               content: undefined,
-              language: undefined
+              language: undefined,
+              length: 0 
             }
-            currentNode.children!.push(child)
+            if (currentNode.children) {
+              currentNode.children.push(child)
+            }
           }
           currentNode = child
         })
@@ -58,7 +62,7 @@ export default function useFileTree() {
         setSelectedFile(firstFile)
       }
     } catch (err) {
-      console.error("Error loading zip file:", err)
+      console.error(err)
     }
   }, [originalZipFile])
 
@@ -67,7 +71,7 @@ export default function useFileTree() {
       const url = URL.createObjectURL(originalZipFile)
       const a = document.createElement("a")
       a.href = url
-      a.download = "project.zip"
+      a.download = "code.zip"
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
