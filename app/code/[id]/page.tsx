@@ -14,13 +14,17 @@ import FileTree, { type FileNode } from "@/components/file-tree"
 import { downloadCode, getRelativeTime } from "@/utils/code-utils"
 import { detectLanguageFromExtension } from "@/components/highlight"
 
+// 코드 에디터 로딩 스켈레톤 컴포넌트
+const CodeEditorLoadingSkeleton = () => (
+  <div className="h-full bg-white p-3">
+    <div className="h-full bg-gray-200 rounded animate-pulse"></div>
+  </div>
+);
+
+// 동적 임포트 시 로딩 상태에서 스켈레톤 UI 사용
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-gray-500">뷰어 로딩 중...</div>
-    </div>
-  )
+  loading: () => <CodeEditorLoadingSkeleton />
 })
 
 type Snippet = {
@@ -557,11 +561,7 @@ function CodeViewer({
         theme="vs"
         onMount={handleEditorDidMount}
         options={editorOptions}
-        loading={
-          <div className="flex items-center justify-center h-full">
-            <div className="text-gray-500">뷰어 로딩 중...</div>
-          </div>
-        }
+        loading={<CodeEditorLoadingSkeleton />}
       />
     </div>
   )
