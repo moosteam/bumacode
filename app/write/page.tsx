@@ -250,12 +250,26 @@ export default function WritePage() {
     return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
   };
 
+  const generateRandomString = (length: number = 8): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setFileName(file.name);
-    setTitle(file.name.split(".").slice(0, -1).join("."));
+    const hasKorean = /[가-힣]/.test(file.name);
+    const randomFileName = hasKorean 
+      ? `${generateRandomString()}_${Date.now()}${file.name.slice(file.name.lastIndexOf('.'))}`
+      : file.name;
+
+    setFileName(randomFileName);
+    setTitle(randomFileName.split(".").slice(0, -1).join("."));
     setIsLoading(true);
 
     if (isBinaryFileType(file.name)) {
@@ -277,7 +291,28 @@ export default function WritePage() {
         setOriginalZipFile(file);
         const zipData = await file.arrayBuffer();
         const zip = await JSZip.loadAsync(zipData);
+        
+        const processFileName = (name: string): string => {
+          const hasKorean = /[가-힣]/.test(name);
+          if (hasKorean) {
+            return `${generateRandomString()}_${Date.now()}${name.slice(name.lastIndexOf('.'))}`;
+          }
+          return name;
+        };
+
         const tree = await createFileTree(zip);
+        if (tree.children) {
+          const processNode = (node: FileNode) => {
+            if (node.name) {
+              node.name = processFileName(node.name);
+            }
+            if (node.children) {
+              node.children.forEach(processNode);
+            }
+          };
+          processNode(tree);
+        }
+        
         setFileTree(tree);
         setIsZipMode(true);
         const firstFile = findFirstFile(tree);
@@ -404,8 +439,7 @@ export default function WritePage() {
           }
           
           const zipBlob = await zip.generateAsync({ type: 'blob' });
-          const newZipFile = new File([zipBlob], originalZipFile.name, { type: 'application/zip' });
-          
+          const newZipFile = new File([zipBlob], fileName || 'archive.zip', { type: 'application/zip' });
           formData.append('file', newZipFile);
         }
       } else {
