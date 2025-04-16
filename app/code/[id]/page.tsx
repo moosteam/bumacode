@@ -5,7 +5,6 @@ import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Folder, Copy, Check, FileCode, ExternalLink } from "lucide-react"
 import dynamic from "next/dynamic"
-import "highlight.js/styles/github.css"
 
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
@@ -14,14 +13,12 @@ import FileTree, { type FileNode } from "@/components/file-tree"
 import { downloadCode, getRelativeTime } from "@/utils/code-utils"
 import { detectLanguageFromExtension } from "@/components/highlight"
 
-// 코드 에디터 로딩 스켈레톤 컴포넌트
 const CodeEditorLoadingSkeleton = () => (
   <div className="h-full bg-white p-3">
     <div className="h-full bg-gray-200 rounded animate-pulse"></div>
   </div>
 );
 
-// 동적 임포트 시 로딩 상태에서 스켈레톤 UI 사용
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => <CodeEditorLoadingSkeleton />
@@ -47,11 +44,9 @@ function DetailSkeleton() {
   )
 }
 
-// 파일 단일 뷰 스켈레톤 UI - 완전히 수정된 버전
 function FileCodeViewerSkeleton() {
   return (
     <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
-      {/* 상단 헤더 */}
       <div 
         className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
         style={{ height: '40px' }}
@@ -193,8 +188,33 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     snippet.fileType === "zip" : 
     false
 
+  const isBinaryFile = snippet ? 
+    snippet.filePath.toLowerCase().endsWith(".unitypackage") || 
+    snippet.filePath.toLowerCase().endsWith(".xlsx") || 
+    snippet.filePath.toLowerCase().endsWith(".xls") || 
+    snippet.filePath.toLowerCase().endsWith(".doc") || 
+    snippet.filePath.toLowerCase().endsWith(".docx") || 
+    snippet.filePath.toLowerCase().endsWith(".pdf") || 
+    snippet.filePath.toLowerCase().endsWith(".jpg") || 
+    snippet.filePath.toLowerCase().endsWith(".jpeg") || 
+    snippet.filePath.toLowerCase().endsWith(".png") || 
+    snippet.filePath.toLowerCase().endsWith(".gif") || 
+    snippet.filePath.toLowerCase().endsWith(".bmp") || 
+    snippet.filePath.toLowerCase().endsWith(".ico") || 
+    snippet.filePath.toLowerCase().endsWith(".svg") || 
+    snippet.filePath.toLowerCase().endsWith(".mp3") || 
+    snippet.filePath.toLowerCase().endsWith(".mp4") || 
+    snippet.filePath.toLowerCase().endsWith(".wav") || 
+    snippet.filePath.toLowerCase().endsWith(".avi") || 
+    snippet.filePath.toLowerCase().endsWith(".mov") || 
+    snippet.filePath.toLowerCase().endsWith(".wmv") || 
+    snippet.filePath.toLowerCase().endsWith(".psd") || 
+    snippet.filePath.toLowerCase().endsWith(".ai") || 
+    snippet.filePath.toLowerCase().endsWith(".sketch") : 
+    false;
+
   useEffect(() => {
-    if (snippet && !isZip) {
+    if (snippet && !isZip && !isBinaryFile) {
       if (snippet.code) {
         setLineCount(snippet.code.split('\n').length);
         setFileSize(new TextEncoder().encode(snippet.code).length);
@@ -214,7 +234,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
           setLoading(false);
         });
     }
-  }, [snippet, isZip]);
+  }, [snippet, isZip, isBinaryFile]);
 
   useEffect(() => {
     if (snippet && isZip) {
@@ -311,6 +331,12 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
 
   const selectedFileSlocCount = selectedFileContent.split('\n').filter(line => line.trim().length > 0).length;
 
+  const handleBinaryFileDownload = () => {
+    if (snippet && snippet.filePath) {
+      window.open(snippet.filePath, '_blank');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
@@ -404,6 +430,47 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                           표시할 파일을 선택하세요.
                         </div>
                       )}
+                    </div>
+                  </div>
+                </div>
+              ) : isBinaryFile ? (
+                <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
+                  <div 
+                    className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
+                    style={{ height: '40px' }}
+                  >
+                    <div className="flex items-center">
+                      <FileCode size={16} className="mr-2 text-gray-500" />
+                      <span className="font-semibold text-sm">
+                        {snippet.filePath ? snippet.filePath.split('.').pop()?.toLowerCase() || 'bin' : 'bin'}
+                      </span>
+                      <span className="ml-4 text-xs text-gray-600">
+                        {formatFileSize(fileSize)}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="text-xs flex items-center space-x-2">
+                        <button 
+                          className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                          onClick={handleBinaryFileDownload}
+                        >
+                          <Download size={14} />
+                          <span>다운로드</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-full" style={{ height: 'calc(100% - 40px)' }}>
+                    <div className="flex items-center justify-center h-full flex-col p-8 bg-gray-50">
+                      <FileCode size={48} className="text-gray-400 mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">{snippet.title}</h3>
+                      <div className="text-gray-500 text-sm space-y-1">
+                        <p>파일 크기: {formatFileSize(fileSize)}</p>
+                        <p>파일 형식: {snippet.filePath ? snippet.filePath.split('.').pop()?.toLowerCase() || 'bin' : 'bin'}</p>
+                      </div>
+                      <p className="text-gray-400 text-sm mt-4">
+                        이 파일은 바이너리 파일이므로 미리보기를 제공하지 않습니다.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -508,6 +575,16 @@ function CodeViewer({
   
   const formattedFileSize = (fileSize / 1024).toFixed(1) + ' KB';
 
+  // 파일 확장자로부터 언어 감지
+  const getMonacoLanguage = () => {
+    if (filePath) {
+      const extension = filePath.split('.').pop()?.toLowerCase() || '';
+      const detectedLanguage = detectLanguageFromExtension(extension);
+      return detectedLanguage || 'plaintext';
+    }
+    return language || 'plaintext';
+  };
+
   const editorOptions = {
     fontSize: 12,
     fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
@@ -548,15 +625,13 @@ function CodeViewer({
     selectionHighlight: false,
     lineDecorationsWidth: 0
   }
-  
-  const monacoLanguage = language.toLowerCase() === 'plaintext' ? 'text' : language.toLowerCase();
 
   return (
     <div className="h-full bg-white">
       <Editor
         height="100%"
         width="100%"
-        language={monacoLanguage}
+        language={getMonacoLanguage()}
         value={code}
         theme="vs"
         onMount={handleEditorDidMount}
