@@ -158,7 +158,7 @@ export default function Home() {
             <div className="divide-y divide-gray-200">{skeletonItems}</div>
           ) : sortedSnippets.length === 0 ? (
             <div className="text-center py-4">
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <Image 
                   src="/ddung.png" 
                   alt="등록된 코드 없음" 
@@ -166,7 +166,7 @@ export default function Home() {
                   height={80}
                   className="mx-auto"
                 />
-              </div>
+              </div> */}
               <p className="text-gray-500">※ 등록된 코드가 없습니다.</p>
             </div>
           ) : (

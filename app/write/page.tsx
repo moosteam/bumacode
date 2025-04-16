@@ -9,75 +9,7 @@ import { useRouter } from "next/navigation";
 import FileTree, { type FileNode } from "@/components/file-tree";
 import Header from "@/components/layout/header";
 import WriteButton from "@/components/ui/wirte-button";
-
-const languageDisplayNames: { [key: string]: string } = {
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  python: "Python",
-  java: "Java",
-  cpp: "C++",
-  c: "C",
-  csharp: "C#",
-  php: "PHP",
-  ruby: "Ruby",
-  go: "Go",
-  rust: "Rust",
-  swift: "Swift",
-  kotlin: "Kotlin",
-  html: "HTML",
-  css: "CSS",
-  json: "JSON",
-  xml: "XML",
-  sql: "SQL",
-  plaintext: "Plain Text"
-};
-
-const detectLanguageFromExtension = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase() || '';
-  const languageMap: { [key: string]: string } = {
-    'js': 'javascript',
-    'jsx': 'javascript',
-    'ts': 'typescript',
-    'tsx': 'typescript',
-    'py': 'python',
-    'java': 'java',
-    'cpp': 'cpp',
-    'c': 'c',
-    'cs': 'csharp',
-    'php': 'php',
-    'rb': 'ruby',
-    'go': 'go',
-    'rs': 'rust',
-    'swift': 'swift',
-    'kt': 'kotlin',
-    'html': 'html',
-    'css': 'css',
-    'json': 'json',
-    'xml': 'xml',
-    'sql': 'sql'
-  };
-  return languageMap[extension] || 'plaintext';
-};
-
-const detectLanguage = (code: string): string => {
-  // 간단한 휴리스틱 기반 언어 감지
-  if (code.includes('function') || code.includes('const') || code.includes('let') || code.includes('var')) {
-    return 'javascript';
-  }
-  if (code.includes('def ') || code.includes('import ') || code.includes('print(')) {
-    return 'python';
-  }
-  if (code.includes('public class') || code.includes('System.out.println')) {
-    return 'java';
-  }
-  if (code.includes('<?php')) {
-    return 'php';
-  }
-  if (code.includes('package main') || code.includes('func ')) {
-    return 'go';
-  }
-  return 'plaintext';
-};
+import { detectLanguage, detectLanguageFromExtension, isBinaryFileType, languageDisplayNames } from "@/utils/file-types";
 
 const LoadingEditor = ({ isZip }: { isZip?: boolean }) => {
   return (
@@ -220,6 +152,23 @@ export default function WritePage() {
     setEditorReady(true);
   };
 
+  const generateRandomString = (length: number = 8): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const processFileName = (name: string): string => {
+    const hasKorean = /[가-힣]/.test(name);
+    if (hasKorean) {
+      return `${generateRandomString()}_${Date.now()}${name.slice(name.lastIndexOf('.'))}`;
+    }
+    return name;
+  };
+
   const createFileTree = async (zip: JSZip): Promise<FileNode> => {
     const root: FileNode = {
       name: "root",
@@ -243,7 +192,8 @@ export default function WritePage() {
         addDirectoryToTree(root, pathParts);
       } else {
         const promise = zipEntry.async("string").then((content) => {
-          const fileNode = addFileToTree(root, pathParts);
+          const processedPathParts = pathParts.map(part => processFileName(part));
+          const fileNode = addFileToTree(root, processedPathParts);
           if (fileNode) {
             fileNode.content = content;
             fileNode.language = detectLanguageFromExtension(path);
@@ -319,32 +269,11 @@ export default function WritePage() {
     return fileNode;
   };
 
-  const isBinaryFileType = (fileName: string): boolean => {
-    const binaryExtensions = [
-      '.unitypackage', '.xlsx', '.xls', '.doc', '.docx', '.pdf', 
-      '.rar', '.7z', '.exe', '.dll', '.so', '.dylib',
-      '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.ico', '.svg',
-      '.mp3', '.mp4', '.wav', '.avi', '.mov', '.wmv',
-      '.psd', '.ai', '.sketch'
-    ];
-    const ext = fileName.toLowerCase().slice(fileName.lastIndexOf('.'));
-    return binaryExtensions.includes(ext);
-  };
-
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
-  };
-
-  const generateRandomString = (length: number = 8): string => {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -379,14 +308,6 @@ export default function WritePage() {
         const zipData = await file.arrayBuffer();
         const zip = await JSZip.loadAsync(zipData);
         
-        const processFileName = (name: string): string => {
-          const hasKorean = /[가-힣]/.test(name);
-          if (hasKorean) {
-            return `${generateRandomString()}_${Date.now()}${name.slice(name.lastIndexOf('.'))}`;
-          }
-          return name;
-        };
-
         const tree = await createFileTree(zip);
         if (tree.children) {
           const processNode = (node: FileNode) => {

@@ -7,80 +7,13 @@ import { ArrowLeft, Download, Folder, Copy, Check, FileCode, ExternalLink } from
 import dynamic from "next/dynamic"
 import { useAtom } from "jotai"
 import { currentTimeAtom, calculateRemainingTime } from "@/components/time"
+import { detectLanguage, detectLanguageFromExtension, isBinaryFileType, languageDisplayNames } from "@/utils/file-types"
 
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import useFileTree from "@/hooks/use-file-tree"
 import FileTree, { type FileNode } from "@/components/file-tree"
 import { downloadCode, getRelativeTime } from "@/utils/code-utils"
-
-const languageDisplayNames: { [key: string]: string } = {
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  python: "Python",
-  java: "Java",
-  cpp: "C++",
-  c: "C",
-  csharp: "C#",
-  php: "PHP",
-  ruby: "Ruby",
-  go: "Go",
-  rust: "Rust",
-  swift: "Swift",
-  kotlin: "Kotlin",
-  html: "HTML",
-  css: "CSS",
-  json: "JSON",
-  xml: "XML",
-  sql: "SQL",
-  plaintext: "Plain Text"
-};
-
-const detectLanguageFromExtension = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase() || '';
-  const languageMap: { [key: string]: string } = {
-    'js': 'javascript',
-    'jsx': 'javascript',
-    'ts': 'typescript',
-    'tsx': 'typescript',
-    'py': 'python',
-    'java': 'java',
-    'cpp': 'cpp',
-    'c': 'c',
-    'cs': 'csharp',
-    'php': 'php',
-    'rb': 'ruby',
-    'go': 'go',
-    'rs': 'rust',
-    'swift': 'swift',
-    'kt': 'kotlin',
-    'html': 'html',
-    'css': 'css',
-    'json': 'json',
-    'xml': 'xml',
-    'sql': 'sql'
-  };
-  return languageMap[extension] || 'plaintext';
-};
-
-const detectLanguage = (code: string): string => {
-  if (code.includes('function') || code.includes('const') || code.includes('let') || code.includes('var')) {
-    return 'javascript';
-  }
-  if (code.includes('def ') || code.includes('import ') || code.includes('print(')) {
-    return 'python';
-  }
-  if (code.includes('public class') || code.includes('System.out.println')) {
-    return 'java';
-  }
-  if (code.includes('<?php')) {
-    return 'php';
-  }
-  if (code.includes('package main') || code.includes('func ')) {
-    return 'go';
-  }
-  return 'plaintext';
-};
 
 const CodeEditorLoadingSkeleton = () => (
   <div className="h-full bg-white p-3">
@@ -254,28 +187,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     false
 
   const isBinaryFile = snippet ? 
-    snippet.filePath.toLowerCase().endsWith(".unitypackage") || 
-    snippet.filePath.toLowerCase().endsWith(".xlsx") || 
-    snippet.filePath.toLowerCase().endsWith(".xls") || 
-    snippet.filePath.toLowerCase().endsWith(".doc") || 
-    snippet.filePath.toLowerCase().endsWith(".docx") || 
-    snippet.filePath.toLowerCase().endsWith(".pdf") || 
-    snippet.filePath.toLowerCase().endsWith(".jpg") || 
-    snippet.filePath.toLowerCase().endsWith(".jpeg") || 
-    snippet.filePath.toLowerCase().endsWith(".png") || 
-    snippet.filePath.toLowerCase().endsWith(".gif") || 
-    snippet.filePath.toLowerCase().endsWith(".bmp") || 
-    snippet.filePath.toLowerCase().endsWith(".ico") || 
-    snippet.filePath.toLowerCase().endsWith(".svg") || 
-    snippet.filePath.toLowerCase().endsWith(".mp3") || 
-    snippet.filePath.toLowerCase().endsWith(".mp4") || 
-    snippet.filePath.toLowerCase().endsWith(".wav") || 
-    snippet.filePath.toLowerCase().endsWith(".avi") || 
-    snippet.filePath.toLowerCase().endsWith(".mov") || 
-    snippet.filePath.toLowerCase().endsWith(".wmv") || 
-    snippet.filePath.toLowerCase().endsWith(".psd") || 
-    snippet.filePath.toLowerCase().endsWith(".ai") || 
-    snippet.filePath.toLowerCase().endsWith(".sketch") : 
+    isBinaryFileType(snippet.filePath) : 
     false;
 
   useEffect(() => {
