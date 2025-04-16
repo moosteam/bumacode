@@ -442,10 +442,16 @@ export default function WritePage() {
           formData.append('file', newZipFile);
         }
       } else {
-        formData.append('code', code);
-        if (fileName && !isBinaryFile) {
-          const file = new File([code], fileName, { type: 'text/plain' });
-          formData.append('file', file);
+        if (isBinaryFile && binaryFileInfo) {
+          if (fileInputRef.current?.files?.[0]) {
+            formData.append('file', fileInputRef.current.files[0]);
+          }
+        } else {
+          formData.append('code', code);
+          if (fileName && !isBinaryFile) {
+            const file = new File([code], fileName, { type: 'text/plain' });
+            formData.append('file', file);
+          }
         }
       }
 

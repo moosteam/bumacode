@@ -233,6 +233,18 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
           console.error("Failed to load code content", err);
           setLoading(false);
         });
+    } else if (snippet && isBinaryFile) {
+      // 바이너리 파일인 경우
+      fetch(snippet.filePath)
+        .then((res) => res.blob())
+        .then((blob) => {
+          setFileSize(blob.size);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch binary file:", err);
+          setLoading(false);
+        });
     }
   }, [snippet, isZip, isBinaryFile]);
 
@@ -463,7 +475,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                   <div className="h-full" style={{ height: 'calc(100% - 40px)' }}>
                     <div className="flex items-center justify-center h-full flex-col p-8 bg-gray-50">
                       <FileCode size={48} className="text-gray-400 mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">{snippet.title}</h3>
+                      <h3 className="text-xl font-semibold mb-2">{snippet.filePath ? snippet.filePath.split('/').pop() || 'bin' : 'bin'}</h3>
                       <div className="text-gray-500 text-sm space-y-1">
                         <p>파일 크기: {formatFileSize(fileSize)}</p>
                         <p>파일 형식: {snippet.filePath ? snippet.filePath.split('.').pop()?.toLowerCase() || 'bin' : 'bin'}</p>
