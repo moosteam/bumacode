@@ -58,6 +58,7 @@ export const binaryExtensions = [
   '.webm', '.m4v', '.3gp', '.mpeg', '.mpg', '.vob', '.swf',
   '.stl', '.dwg', '.dxf', '.3mf', '.obj', '.fbx', '.3ds', '.max',
   '.blend', '.ma', '.mb', '.lwo', '.ply', '.gltf', '.glb',
+  '.f3d', '.step', '.ipt', '.iam',
   '.db', '.sqlite', '.mdb', '.accdb', '.frm', '.myd', '.myi',
   '.vdi', '.vmdk', '.vhd', '.vhdx', '.qcow2', '.img', '.bin',
   '.dat', '.bin', '.pak', '.pak2', '.pak3', '.pak4', '.pak5',
