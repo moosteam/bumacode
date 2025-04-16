@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import GuideSection from "@/components/guide";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -132,6 +133,7 @@ export default function Home() {
                 <option value="전체">전체</option>
                 <option value="zip">ZIP 파일</option>
                 <option value="file">파일 및 코드</option>
+                <option value="binary">바이너리</option>
               </select>
               <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
                 <svg
@@ -156,7 +158,16 @@ export default function Home() {
             <div className="divide-y divide-gray-200">{skeletonItems}</div>
           ) : sortedSnippets.length === 0 ? (
             <div className="text-center py-4">
-              <p>※ 등록된 코드가 없습니다.</p>
+              <div className="mb-4">
+                <Image 
+                  src="/ddung.png" 
+                  alt="등록된 코드 없음" 
+                  width={80} 
+                  height={80}
+                  className="mx-auto"
+                />
+              </div>
+              <p className="text-gray-500">※ 등록된 코드가 없습니다.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
