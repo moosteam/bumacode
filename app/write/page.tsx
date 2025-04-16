@@ -269,7 +269,6 @@ export default function WritePage() {
       : file.name;
 
     setFileName(randomFileName);
-    setTitle(randomFileName.split(".").slice(0, -1).join("."));
     setIsLoading(true);
 
     if (isBinaryFileType(file.name)) {
