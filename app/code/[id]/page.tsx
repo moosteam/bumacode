@@ -591,8 +591,8 @@ function CodeViewer({
   };
 
   const editorOptions = {
-    fontSize: 12,
-    fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
+    fontSize: 13,
+    fontFamily: 'Consolas, "Courier New", monospace',
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
     automaticLayout: true,
@@ -616,7 +616,7 @@ function CodeViewer({
     hideCursorInOverviewRuler: true,
     folding: true,
     renderLineHighlight: "line",
-    lineHeight: 20,
+    lineHeight: 21,
     padding: { top: 12, bottom: 12 },
     scrollBeyondLastColumn: 0,
     glyphMargin: false,

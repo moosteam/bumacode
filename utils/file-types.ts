@@ -49,7 +49,7 @@ export const detectLanguageFromExtension = (fileName: string): string => {
 
 export const binaryExtensions = [
   '.unitypackage', '.xlsx', '.xls', '.xlsm', '.doc', '.docx', '.pdf', 
-  '.ppt', '.pptx', '.odt', '.ods', '.odp', '.rtf', '.txt',
+  '.ppt', '.pptx', '.odt', '.ods', '.odp', '.rtf',
   '.rar', '.7z', '.zip', '.tar', '.gz', '.bz2', '.iso', '.dmg',
   '.exe', '.dll', '.so', '.dylib', '.msi', '.deb', '.rpm', '.apk',
   '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.ico', '.svg', '.webp',

@@ -50,6 +50,7 @@ export default function WritePage() {
   const [editorReady, setEditorReady] = useState(false);
   const [userIp, setUserIp] = useState<string>("");
   const [isIpLoading, setIsIpLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [lineCount, setLineCount] = useState(0);
   const [fileSize, setFileSize] = useState(0);
@@ -400,6 +401,8 @@ export default function WritePage() {
   }, [code, language, fileName, isZipMode, selectedFile, fileTree]);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
     const errors: { title?: string; code?: string } = {};
     
     if (!title.trim()) {
@@ -415,6 +418,7 @@ export default function WritePage() {
     }
     
     setValidationErrors({});
+    setIsSubmitting(true);
     
     try {
       const formData = new FormData();
@@ -478,6 +482,8 @@ export default function WritePage() {
     } catch (error) {
       console.error('Error submitting:', error);
       alert(error instanceof Error ? error.message : '제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };  
 
@@ -511,8 +517,8 @@ export default function WritePage() {
   };
 
   const editorOptions = {
-    fontSize: 12,
-    fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
+    fontSize: 13,
+    fontFamily: 'Consolas, "Courier New", monospace',
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
     automaticLayout: true,
@@ -534,7 +540,7 @@ export default function WritePage() {
     hideCursorInOverviewRuler: true,
     folding: true,
     renderLineHighlight: "line",
-    lineHeight: 20,
+    lineHeight: 21,
     padding: { top: 12, bottom: 12 },
     scrollBeyondLastColumn: 0,
     glyphMargin: false,
@@ -803,6 +809,7 @@ export default function WritePage() {
             <WriteButton 
               onWrite={handleSubmit} 
               onCancel={() => window.history.back()} 
+              disabled={isSubmitting}
             />
           </div>
         </form>
