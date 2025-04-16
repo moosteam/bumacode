@@ -5,6 +5,8 @@ import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Folder, Copy, Check, FileCode, ExternalLink } from "lucide-react"
 import dynamic from "next/dynamic"
+import { useAtom } from "jotai"
+import { currentTimeAtom, calculateRemainingTime } from "@/components/time"
 
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
@@ -62,7 +64,6 @@ const detectLanguageFromExtension = (fileName: string): string => {
 };
 
 const detectLanguage = (code: string): string => {
-  // 간단한 휴리스틱 기반 언어 감지
   if (code.includes('function') || code.includes('const') || code.includes('let') || code.includes('var')) {
     return 'javascript';
   }
@@ -121,20 +122,16 @@ function FileCodeViewerSkeleton() {
       >
         <div className="flex items-center">
           <div className="h-4 w-4 bg-gray-300 rounded mr-2 animate-pulse"></div>
-          {/* 파일 확장자 자리 표시자 */}
           <div className="h-4 bg-gray-300 rounded w-8 animate-pulse mr-3"></div>
-          {/* 추가 정보 자리 표시자 - 정확한 높이와 세로 중앙 정렬 */}
           <div className="h-4 bg-gray-300 rounded w-44 animate-pulse"></div>
         </div>
         <div className="flex items-center space-x-2">
-          {/* 버튼 영역 - 실제 버튼 모양과 유사하게 */}
           <div className="flex space-x-2">
             <div className="h-6 bg-gray-300 rounded-md w-14 animate-pulse"></div>
             <div className="h-6 bg-gray-300 rounded-md w-14 animate-pulse"></div>
           </div>
         </div>
       </div>
-      {/* 코드 영역 - 전체 큰 네모로 처리 */}
       <div className="h-full bg-white p-3" style={{height: 'calc(100% - 40px)'}}>
         <div className="h-full bg-gray-200 rounded animate-pulse"></div>
       </div>
@@ -142,11 +139,9 @@ function FileCodeViewerSkeleton() {
   )
 }
 
-// ZIP 파일 스켈레톤 UI - 완전히 수정된 버전
 function ZipCodeViewerSkeleton() {
   return (
     <div className="border rounded-lg overflow-hidden bg-white code-viewer-container">
-      {/* 상단 헤더 */}
       <div 
         className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center"
         style={{ height: '40px' }}
@@ -157,13 +152,10 @@ function ZipCodeViewerSkeleton() {
           <div className="h-4 bg-gray-300 rounded w-16 animate-pulse"></div>
         </div>
         <div className="flex items-center">
-          {/* ZIP 다운로드 버튼 */}
           <div className="h-6 bg-gray-300 rounded-md w-24 animate-pulse"></div>
         </div>
       </div>
-      {/* 본문 영역 */}
       <div className="flex" style={{ height: 'calc(100% - 40px)' }}>
-        {/* 왼쪽 파일 트리 영역 */}
         <div className="w-1/5 border-r bg-white p-3" style={{ borderRight: '0.5px solid #E5E5E5' }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="mb-3">
@@ -185,9 +177,7 @@ function ZipCodeViewerSkeleton() {
             </div>
           ))}
         </div>
-        {/* 오른쪽 코드 뷰 영역 */}
         <div className="w-4/5" style={{ paddingLeft: '2px' }}>
-          {/* 코드 뷰어 상단 헤더 */}
           <div 
             className="bg-gray-100 px-3 py-2 border-b flex justify-between items-center"
             style={{ height: '40px' }}
@@ -202,7 +192,6 @@ function ZipCodeViewerSkeleton() {
               <div className="h-6 bg-gray-300 rounded-md w-24 animate-pulse"></div>
             </div>
           </div>
-          {/* 코드 영역 - 전체 큰 네모로 처리 */}
           <div className="h-full border-t p-3" style={{ height: 'calc(100% - 40px)' }}>
             <div className="h-full bg-gray-200 rounded animate-pulse"></div>
           </div>
@@ -219,6 +208,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const [snippet, setSnippet] = useState<Snippet | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom)
   const {
     fileTree,
     loadExampleZip,
@@ -232,6 +222,13 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const [lineCount, setLineCount] = useState(0)
   const [fileSize, setFileSize] = useState(0)
   const [zipCopied, setZipCopied] = useState(false)
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(intervalId);
+  }, [setCurrentTime]);
 
   useEffect(() => {
     const fetchSnippet = async () => {
@@ -302,7 +299,6 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
           setLoading(false);
         });
     } else if (snippet && isBinaryFile) {
-      // 바이너리 파일인 경우
       fetch(snippet.filePath)
         .then((res) => res.blob())
         .then((blob) => {
@@ -362,6 +358,24 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
       setTimeout(() => setCopied(false), 2000)
     }
   }
+
+  const parseCreatedAt = (createdAt: string): Date => {
+    const parts = createdAt.split(" ");
+    const dateParts = parts[0].split(".").map(part => part.trim());
+    const timeParts = parts[1].split(":").map(part => part.trim());
+    
+    if (dateParts.length >= 3 && timeParts.length >= 3) {
+      const year = parseInt(dateParts[0]);
+      const month = parseInt(dateParts[1]) - 1;
+      const day = parseInt(dateParts[2]);
+      const hours = parseInt(timeParts[0]);
+      const minutes = parseInt(timeParts[1]);
+      const seconds = parseInt(timeParts[2]);
+      
+      return new Date(year, month, day, hours, minutes, seconds);
+    }
+    return new Date(createdAt);
+  };
 
   const relativeTime = snippet ? getRelativeTime(snippet.createdAt) : ""
 
@@ -433,7 +447,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                 <h1 className="text-3xl font-bold">{snippet.title}</h1>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-gray-500 text-sm">
-                    {relativeTime} {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))} 등록 · 18분 후 삭제
+                    {relativeTime} {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))} 등록 · {calculateRemainingTime(snippet.createdAt, currentTime)}
                   </span>
                 </div>
               </div>
@@ -655,7 +669,6 @@ function CodeViewer({
   
   const formattedFileSize = (fileSize / 1024).toFixed(1) + ' KB';
 
-  // 파일 확장자로부터 언어 감지
   const getMonacoLanguage = () => {
     if (filePath) {
       const extension = filePath.split('.').pop()?.toLowerCase() || '';

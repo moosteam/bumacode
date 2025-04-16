@@ -7,6 +7,7 @@ import Footer from "@/components/layout/footer";
 import { useState, useEffect } from "react";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
+import { currentTimeAtom, calculateRemainingTime } from "@/components/time";
 
 export type Snippet = {
   id: number;
@@ -41,14 +42,14 @@ export default function Home() {
   const [codeSnippets, setCodeSnippets] = useAtom(codeSnippetsAtom);
   const [loading, setLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [setCurrentTime]);
 
   useEffect(() => {
     const fetchSnippets = async () => {
@@ -60,7 +61,6 @@ export default function Home() {
           ...item,
           type: item.type || "코드",
           language: item.language || "JavaScript",
-          deleteAfter: item.deleteAfter || "5분 후 삭제",
         }));
         setCodeSnippets(transformedItems);
         setDataFetched(true);
@@ -78,10 +78,19 @@ export default function Home() {
   }, [codeSnippets.length, dataFetched, setCodeSnippets]);
 
   const parseCreatedAt = (createdAt: string): Date => {
-    const cleaned = createdAt.replace(/\./g, "-").replace(/\s+/g, " ").trim();
-    const parts = cleaned.split(" ");
-    if (parts.length >= 2) {
-      return new Date(parts[0] + "T" + parts[1]);
+    const parts = createdAt.split(" ");
+    const dateParts = parts[0].split(".").map(part => part.trim());
+    const timeParts = parts[1].split(":").map(part => part.trim());
+    
+    if (dateParts.length >= 3 && timeParts.length >= 3) {
+      const year = parseInt(dateParts[0]);
+      const month = parseInt(dateParts[1]) - 1;
+      const day = parseInt(dateParts[2]);
+      const hours = parseInt(timeParts[0]);
+      const minutes = parseInt(timeParts[1]);
+      const seconds = parseInt(timeParts[2]);
+      
+      return new Date(year, month, day, hours, minutes, seconds);
     }
     return new Date(createdAt);
   };
@@ -171,7 +180,7 @@ export default function Home() {
                         {displayUserIp(snippet.userIp)}
                       </span>
                       <span className="text-gray-500 text-xs">
-                        {snippet.deleteAfter}
+                        {calculateRemainingTime(snippet.createdAt, currentTime)}
                       </span>
                     </div>
 
