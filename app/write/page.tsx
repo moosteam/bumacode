@@ -18,7 +18,19 @@ import WriteButton from "@/components/ui/wirte-button";
 const LoadingEditor = ({ isZip }: { isZip?: boolean }) => {
   return (
     <div className="absolute inset-0 bg-white" style={{ height: isZip ? 'calc(100vh - 280px)' : 'calc(100vh - 380px)' }}>
-      <div className="w-full h-full bg-gray-200 rounded animate-pulse"></div>
+      <div className="w-full h-full flex flex-col">
+        <div className="h-10 bg-gray-50 border-b animate-pulse"></div>
+        <div className="flex-1 flex">
+          <div className="w-16 bg-gray-50 border-r animate-pulse"></div>
+          <div className="flex-1 p-4">
+            <div className="space-y-3">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${Math.random() * 30 + 70}%` }}></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -70,8 +82,20 @@ export default function WritePage() {
   const [zipCopied, setZipCopied] = useState(false);
 
   const CodeEditorLoadingSkeleton = () => (
-    <div className="h-full bg-white p-3" style={{ height: isZipMode ? editorHeight.zip : editorHeight.single }}>
-      <div className="h-full bg-gray-200 rounded animate-pulse"></div>
+    <div className="h-full bg-white" style={{ height: isZipMode ? editorHeight.zip : editorHeight.single }}>
+      <div className="flex flex-col h-full">
+        <div className="h-10 bg-gray-50 border-b animate-pulse"></div>
+        <div className="flex-1 flex">
+          <div className="w-16 bg-gray-50 border-r animate-pulse"></div>
+          <div className="flex-1 p-4">
+            <div className="space-y-3">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="h-4 bg-gray-50 rounded animate-pulse" style={{ width: `${Math.random() * 30 + 70}%` }}></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
