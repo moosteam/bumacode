@@ -160,6 +160,9 @@ export default function Home() {
                 } else if (snippet.type === "zip") {
                   typeText = "ZIP 파일";
                   typeClasses = "text-green-600 bg-green-50";
+                } else if (snippet.type === "binary") {
+                  typeText = "바이너리";
+                  typeClasses = "text-blue-500 bg-blue-50";
                 }
                 return (
                   <div key={snippet.id} className="pt-3 pb-3">
