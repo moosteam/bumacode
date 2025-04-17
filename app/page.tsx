@@ -56,7 +56,7 @@ export default function Home() {
     const fetchSnippets = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/write-get`);
+        const res = await fetch('/api/code');
         const data = await res.json();
         const transformedItems = data.items.map((item: Snippet) => ({
           ...item,
