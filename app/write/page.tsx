@@ -78,6 +78,8 @@ export default function WritePage() {
   const [copied, setCopied] = useState(false);
   const [zipCopied, setZipCopied] = useState(false);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   const CodeEditorLoadingSkeleton = () => (
     <div className="h-full bg-white" style={{ height: isZipMode ? editorHeight.zip : editorHeight.single }}>
       <div className="flex flex-col h-full">
@@ -600,10 +602,43 @@ export default function WritePage() {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      const event = {
+        target: { files: [file] }
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      await handleFileUpload(event);
+    }
+  };
+
   const renderEditorContainer = () => {
     if (isBinaryFile && binaryFileInfo) {
       return (
-        <div className="border rounded-lg overflow-hidden bg-white code-viewer-container relative" style={{ height: editorHeight.single }}>
+        <div 
+          className={`border rounded-lg overflow-hidden bg-white code-viewer-container relative ${isDragging ? 'border-blue-500 bg-blue-50' : ''}`} 
+          style={{ height: editorHeight.single }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <div className="flex items-center justify-center h-full flex-col p-8">
             <FileCode size={48} className="text-gray-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">{fileName}</h3>
@@ -621,7 +656,13 @@ export default function WritePage() {
 
     if (isZipMode) {
       return (
-        <div className="border rounded-lg overflow-hidden bg-white code-viewer-container relative" style={{ height: editorHeight.zip }}>
+        <div 
+          className={`border rounded-lg overflow-hidden bg-white code-viewer-container relative ${isDragging ? 'border-blue-500 bg-blue-50' : ''}`} 
+          style={{ height: editorHeight.zip }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <h1 className="text-2xl font-bold">잠시만 기다려주세요...</h1>
@@ -683,7 +724,13 @@ export default function WritePage() {
       );
     } else {
       return (
-        <div className="border rounded-lg overflow-hidden bg-white code-viewer-container relative" style={{ height: editorHeight.single }}>
+        <div 
+          className={`border rounded-lg overflow-hidden bg-white code-viewer-container relative ${isDragging ? 'border-blue-500 bg-blue-50' : ''}`} 
+          style={{ height: editorHeight.single }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <h1 className="text-2xl font-bold">잠시만 기다려주세요...</h1>
@@ -787,7 +834,7 @@ export default function WritePage() {
                   className="text-sm text-blue-500 flex items-center gap-1"
                 >
                   <Upload size={14} />
-                  <span>파일 업로드</span>
+                  <span>파일 업로드 및 드래그 앤 드롭</span>
                 </button>
                 <input
                   type="file"
