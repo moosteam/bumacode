@@ -39,6 +39,7 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
 export default function WritePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [titleLength, setTitleLength] = useState(0);
   const [code, setCode] = useState("// 여기에 코드를 입력하세요.");
   const [language, setLanguage] = useState("javascript");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -796,22 +797,32 @@ export default function WritePage() {
           className="mb-8"
         >
           <div className="mb-2">
-            <textarea
-              ref={titleInputRef}
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                if (validationErrors.title) {
-                  setValidationErrors(prev => ({ ...prev, title: undefined }));
-                }
-              }}
-              className={`w-full text-4xl font-bold border-none outline-none resize-none overflow-hidden ${
-                validationErrors.title ? 'border-b-2 border-red-500' : ''
-              }`}
-              placeholder="제목을 입력하세요."
-              rows={1}
-              required
-            />
+            <div className="flex justify-between items-center">
+              <textarea
+                ref={titleInputRef}
+                value={title}
+                onChange={(e) => {
+                  const newTitle = e.target.value;
+                  if (newTitle.length <= 25) {
+                    setTitle(newTitle);
+                    setTitleLength(newTitle.length);
+                    if (validationErrors.title) {
+                      setValidationErrors(prev => ({ ...prev, title: undefined }));
+                    }
+                  }
+                }}
+                className={`w-full text-4xl font-bold border-none outline-none resize-none overflow-hidden ${
+                  validationErrors.title ? 'border-b-2 border-red-500' : ''
+                }`}
+                placeholder="제목을 입력하세요."
+                rows={1}
+                maxLength={25}
+                required
+              />
+              <span className="text-sm text-gray-400 ml-2">
+                {titleLength}/25
+              </span>
+            </div>
             {validationErrors.title && (
               <div className="text-red-500 text-sm mt-1">{validationErrors.title}</div>
             )}
