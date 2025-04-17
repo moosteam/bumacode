@@ -68,7 +68,7 @@ export const binaryExtensions = [
   '.pak27', '.pak28', '.pak29', '.pak30', '.pak31', '.pak32', '.pak33',
   '.pak34', '.pak35', '.pak36', '.pak37', '.pak38', '.pak39', '.pak40',
   '.pak41', '.pak42', '.pak43', '.pak44', '.pak45', '.pak46', '.pak47',
-  '.pak48', '.pak49', '.pak50'
+  '.pak48', '.pak49', '.pak50', '.gcode'
 ];
 
 export const isBinaryFileType = (fileName: string): boolean => {
