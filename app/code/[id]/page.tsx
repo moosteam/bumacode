@@ -142,6 +142,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [currentTime, setCurrentTime] = useAtom(currentTimeAtom)
+  const [hasUrls, setHasUrls] = useState(false)
   const {
     fileTree,
     loadExampleZip,
@@ -179,6 +180,13 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     }
     fetchSnippet()
   }, [snippetId])
+
+  useEffect(() => {
+    if (snippet && snippet.code) {
+      const urlRegex = /(https?:\/\/|www\.)[^\s]+/g;
+      setHasUrls(urlRegex.test(snippet.code));
+    }
+  }, [snippet]);
 
   const isZip = snippet ? 
     snippet.filePath.toLowerCase().endsWith(".zip") || 
@@ -517,6 +525,14 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                   </div>
                   <div className="h-full" style={{ height: 'calc(100% - 40px)' }}>
+                    {hasUrls && (
+                      <div className="text-xs text-gray-500 px-4 py-2 bg-gray-50 border-b">
+                        <span className="flex items-center gap-1">
+                          <span>🔗</span>
+                          <span>URL을 클릭하면 새 창에서 열립니다. (Ctrl + 클릭)</span>
+                        </span>
+                      </div>
+                    )}
                     <CodeViewer
                       code={snippet.code || ""}
                       language="plaintext"
@@ -569,6 +585,19 @@ function CodeViewer({
       domReadOnly: true,
       cursorBlinking: "solid",
     })
+
+    editor.onDidChangeCursorPosition((e: any) => {
+      const model = editor.getModel();
+      const position = e.position;
+      const word = model.getWordAtPosition(position);
+      
+      if (word) {
+        const text = model.getValueInRange(word);
+        if (text.match(/^(https?:\/\/|www\.)[^\s]+$/)) {
+          window.location.href = text;
+        }
+      }
+    });
   }
 
   const handleCopyCode = () => {
@@ -628,7 +657,8 @@ function CodeViewer({
     occurrencesHighlight: "off",
     renderIndentGuides: false,
     selectionHighlight: false,
-    lineDecorationsWidth: 0
+    lineDecorationsWidth: 0,
+    links: true
   }
 
   return (
