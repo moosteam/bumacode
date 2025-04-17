@@ -497,7 +497,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                     <div className="flex items-center">
                       <div className="text-xs flex items-center space-x-2">
-                        {openRawCode && (
+                        {openRawCode && !snippet.filePath?.toLowerCase().endsWith('.txt') && (
                           <button 
                             className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
                             onClick={openRawCode}
