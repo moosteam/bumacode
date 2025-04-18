@@ -471,12 +471,9 @@ export default function WritePage() {
         }
       }
 
-      const res = await fetch('/api/code', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/write`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        body: formData,
       });
 
       if (!res.ok) {

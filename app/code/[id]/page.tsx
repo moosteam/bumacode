@@ -168,7 +168,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
     const fetchSnippet = async () => {
       setLoading(true)
       try {
-        const res = await fetch('/api/code');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/write-get`)
         const data = await res.json()
         const found = data.items.find((item: Snippet) => item.id === snippetId)
         if (found) {
