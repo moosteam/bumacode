@@ -5,8 +5,6 @@ import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Folder, Copy, Check, FileCode, ExternalLink } from "lucide-react"
 import dynamic from "next/dynamic"
-import { useAtom } from "jotai"
-import { currentTimeAtom, calculateRemainingTime } from "@/components/time"
 import { detectLanguage, detectLanguageFromExtension, isBinaryFileType, languageDisplayNames } from "@/utils/file-types"
 
 import Header from "@/components/layout/header"
@@ -141,7 +139,6 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const [snippet, setSnippet] = useState<Snippet | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom)
   const [hasUrls, setHasUrls] = useState(false)
   const {
     fileTree,
@@ -156,13 +153,6 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
   const [lineCount, setLineCount] = useState(0)
   const [fileSize, setFileSize] = useState(0)
   const [zipCopied, setZipCopied] = useState(false)
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(intervalId);
-  }, [setCurrentTime]);
 
   useEffect(() => {
     const fetchSnippet = async () => {
@@ -367,7 +357,7 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                 <h1 className="text-3xl font-bold">{snippet.title}</h1>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-gray-500 text-sm">
-                    {relativeTime} {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))} 등록 · {calculateRemainingTime(snippet.createdAt, currentTime)}
+                    {relativeTime} {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))} 등록
                   </span>
                 </div>
               </div>

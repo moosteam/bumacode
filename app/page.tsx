@@ -8,7 +8,6 @@ import Footer from "@/components/layout/footer";
 import { useState, useEffect } from "react";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
-import { currentTimeAtom, calculateRemainingTime } from "@/components/time";
 
 export type Snippet = {
   id: number;
@@ -43,14 +42,6 @@ export default function Home() {
   const [codeSnippets, setCodeSnippets] = useAtom(codeSnippetsAtom);
   const [loading, setLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
-  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(intervalId);
-  }, [setCurrentTime]);
 
   useEffect(() => {
     const fetchSnippets = async () => {
@@ -158,15 +149,6 @@ export default function Home() {
             <div className="divide-y divide-gray-200">{skeletonItems}</div>
           ) : sortedSnippets.length === 0 ? (
             <div className="text-center py-4">
-              {/* <div className="mb-4">
-                <Image 
-                  src="/ddung.png" 
-                  alt="등록된 코드 없음" 
-                  width={80} 
-                  height={80}
-                  className="mx-auto"
-                />
-              </div> */}
               <p className="text-gray-500">※ 등록된 코드가 없습니다.</p>
             </div>
           ) : (
@@ -191,7 +173,7 @@ export default function Home() {
                         {displayUserIp(snippet.userIp)}
                       </span>
                       <span className="text-gray-500 text-xs">
-                        {calculateRemainingTime(snippet.createdAt, currentTime)}
+                        {snippet.createdAt.substring(0, snippet.createdAt.lastIndexOf(':'))}
                       </span>
                     </div>
 
