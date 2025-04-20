@@ -176,6 +176,13 @@ export default function WritePage() {
         setShowPlaceholder(true);
       }
     });
+
+    // Focus the editor and handle placeholder
+    if (editor.getValue() === "// 여기에 코드를 입력하세요.") {
+      editor.setValue("");
+      setShowPlaceholder(false);
+    }
+    editor.focus();
   };
 
   const generateRandomString = (length: number = 8): string => {
