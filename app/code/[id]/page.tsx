@@ -610,7 +610,7 @@ function CodeViewer({
   };
 
   const editorOptions = {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Consolas, "Courier New", monospace',
     minimap: { enabled: false },
     scrollBeyondLastLine: false,

@@ -40,7 +40,8 @@ export default function WritePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [titleLength, setTitleLength] = useState(0);
-  const [code, setCode] = useState("// 여기에 코드를 입력하세요.");
+  const [code, setCode] = useState("");
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [language, setLanguage] = useState("javascript");
   const [fileName, setFileName] = useState<string | null>(null);
   const [isZipMode, setIsZipMode] = useState(false);
@@ -154,6 +155,27 @@ export default function WritePage() {
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
     setEditorReady(true);
+    
+    // Add placeholder text if editor is empty
+    if (!editor.getValue()) {
+      editor.setValue("// 여기에 코드를 입력하세요.");
+      editor.getModel().updateOptions({ tabSize: 2 });
+    }
+    
+    // Add event listeners for placeholder behavior
+    editor.onDidFocusEditorText(() => {
+      if (editor.getValue() === "// 여기에 코드를 입력하세요.") {
+        editor.setValue("");
+        setShowPlaceholder(false);
+      }
+    });
+    
+    editor.onDidBlurEditorText(() => {
+      if (!editor.getValue()) {
+        editor.setValue("// 여기에 코드를 입력하세요.");
+        setShowPlaceholder(true);
+      }
+    });
   };
 
   const generateRandomString = (length: number = 8): string => {
@@ -411,7 +433,7 @@ export default function WritePage() {
     if (!title.trim()) {
       errors.title = "*제목을 입력해주세요.";
     }
-    if (!isZipMode && !isBinaryFile && !code.trim()) {
+    if (!isZipMode && !isBinaryFile && (!code.trim() || code === "// 여기에 코드를 입력하세요.")) {
       errors.code = "*코드를 입력해주세요.";
     }
 
@@ -512,7 +534,9 @@ export default function WritePage() {
   }, [title]);
 
   const handleCodeChange = (value: string | undefined) => {
-    setCode(value || "");
+    const newValue = value || "";
+    setCode(newValue);
+    setShowPlaceholder(newValue === "// 여기에 코드를 입력하세요." || !newValue);
   };
 
   const getLanguageDisplay = (lang: string): string => {
@@ -520,7 +544,7 @@ export default function WritePage() {
   };
 
   const editorOptions = {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Consolas, "Courier New", monospace',
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
@@ -555,7 +579,8 @@ export default function WritePage() {
     occurrencesHighlight: "off",
     renderIndentGuides: false,
     selectionHighlight: false,
-    lineDecorationsWidth: 0
+    lineDecorationsWidth: 0,
+    placeholder: "// 여기에 코드를 입력하세요."
   };
 
   const slocCount = code.split('\n').filter(line => line.trim().length > 0).length;
@@ -845,7 +870,7 @@ export default function WritePage() {
                   className="text-sm text-blue-500 flex items-center gap-1"
                 >
                   <Upload size={14} />
-                  <span>파일 업로드 및 드래그 앤 드롭</span>
+                  <span>파일 업로드</span>
                 </button>
                 <input
                   type="file"
