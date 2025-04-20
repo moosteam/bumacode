@@ -88,14 +88,11 @@ export default function Home() {
       const seconds = parseInt(timeParts[2]);
 
       const date = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
-      
-      // KST (UTC+9) 적용
       date.setHours(date.getHours() + 9); 
       return date;
     }
-    // 예외 케이스나 잘못된 형식의 경우 현재 시간을 반환하거나 오류 처리
     console.warn("Could not parse createdAt string:", createdAt);
-    return new Date(createdAt); // 기본 파싱 시도
+    return new Date(createdAt);
   };
 
   const filteredSnippets = codeSnippets.filter((snippet) => {
@@ -124,48 +121,50 @@ export default function Home() {
         <GuideSection />
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 border-b pb-1.5 mb-4 flex items-center justify-between">
-            <span>최근 등록된 코드</span>
-            <div className="flex items-center gap-2">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date: Date | null) => setSelectedDate(date)}
-                locale={ko}
-                dateFormat="yyyy년 MM월 dd일"
-                placeholderText="날짜 선택"
-                className="block appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-1 px-2.5 rounded-md text-sm font-medium w-36"
-                wrapperClassName="date-picker-wrapper"
-                popperPlacement="bottom-end"
-                showMonthYearPicker={false}
-                dateFormatCalendar="yyyy년 M월"
-              />
-              <div className="relative w-36">
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="block appearance-none w-full bg-gray-50 border border-gray-300 text-gray-700 py-1 px-2.5 rounded-md text-sm font-medium pr-8"
-                  disabled={loading}
-                >
-                  <option value="전체">전체</option>
-                  <option value="zip">ZIP 파일</option>
-                  <option value="file">파일 및 코드</option>
-                  <option value="binary">바이너리</option>
-                </select>
-                <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-1.5 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <span>최근 등록된 코드</span>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date: Date | null) => setSelectedDate(date)}
+                  locale={ko}
+                  dateFormat="yyyy년 MM월 dd일"
+                  placeholderText="날짜 선택"
+                  className="block appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-1 px-2.5 rounded-md text-sm font-medium w-full sm:w-36"
+                  wrapperClassName="date-picker-wrapper"
+                  popperPlacement="bottom-end"
+                  showMonthYearPicker={false}
+                  dateFormatCalendar="yyyy년 M월"
+                />
+                <div className="relative w-full sm:w-36">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="block appearance-none w-full bg-gray-50 border border-gray-300 text-gray-0 py-1 px-2.5 rounded-md text-sm font-medium pr-8"
+                    disabled={loading}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                    <option value="전체">전체</option>
+                    <option value="zip">ZIP 파일</option>
+                    <option value="file">파일 및 코드</option>
+                    <option value="binary">바이너리</option>
+                  </select>
+                  <div className="absolute top-1/2 right-2 transform -translate-y-1/2 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
