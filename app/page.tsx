@@ -233,17 +233,10 @@ export default function Home() {
               color: #333;
               font-size: 12px;
             }
-            .react-datepicker__day:hover {
-              background-color: #f0f0f0;
-              border-radius: 50%;
-            }
             .react-datepicker__day--selected {
-              background-color: #0ea5e9;
+              background-color: #fefce8;
               border-radius: 50%;
-              color: white;
-            }
-            .react-datepicker__day--selected:hover {
-              background-color: #0284c7;
+              color: #eab308;
             }
             .react-datepicker__day--today {
               background-color: #eff6ff;
