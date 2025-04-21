@@ -15,8 +15,8 @@
             <div className="flex items-start gap-2.5">
               <Clock className="w-5 h-5 mt-0.5 text-blue-600" />
               <div>
-                <h3 className={guideItemTitle}>시간 제한</h3>
-                <p>공유한 코드는 20분 동안만 리스트에 등록됩니다. (20분이 지나면 데이터베이스에서 사라집니다.)</p>
+                <h3 className={guideItemTitle}>시간 설정정</h3>
+                <p>공유된 코드는 최소 5분에서 최대 24시간까지 보관할 수 있으며, 영구 보존이 필요한 코드도 업로드할 수 있습니다.</p>
               </div>
             </div>
 

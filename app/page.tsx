@@ -284,7 +284,7 @@ export default function Home() {
                   <div key={snippet.id} className="pt-3 pb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-gray-500 text-xs">
-                        {displayUserIp(snippet.userIp)} · {snippet.expireAt === "영구보존됨" ? "삭제되지 않음" : `${snippet.expireAt} 삭제`}
+                        {displayUserIp(snippet.userIp)} · {snippet.expireAt === "영구보존됨" ? "영구 보존" : `${snippet.expireAt} 삭제`}
                       </span>
                     </div>
 

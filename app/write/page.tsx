@@ -924,7 +924,7 @@ export default function WritePage() {
                       className="w-4 h-4"
                     />
                     <label htmlFor="permanent" className="text-sm text-gray-600">
-                      삭제 안하기
+                      영구 보존
                     </label>
                   </div>
                   <select
