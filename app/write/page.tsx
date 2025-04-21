@@ -58,8 +58,8 @@ export default function WritePage() {
   const [fileSize, setFileSize] = useState(0);
   
   const [editorHeight, setEditorHeight] = useState({
-    zip: "calc(100vh - 260px)",
-    single: "calc(100vh - 360px)"
+    zip: "calc(100vh - 200px)",
+    single: "calc(100vh - 300px)"
   });
 
   const [validationErrors, setValidationErrors] = useState<{
@@ -121,8 +121,8 @@ export default function WritePage() {
   useEffect(() => {
     const updateEditorHeight = () => {
       setEditorHeight({
-        zip: `calc(100vh - 260px)`,
-        single: `calc(100vh - 360px)`
+        zip: `calc(100vh - 200px)`,
+        single: `calc(100vh - 300px)`
       });
     };
 
@@ -880,70 +880,6 @@ export default function WritePage() {
           </div>
 
           <div className="mb-4">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg h-[52px]">
-                <div className="flex items-center gap-2">
-                  <Upload size={16} className="text-gray-500" />
-                  <span className="text-sm text-gray-600">파일 업로드</span>
-                </div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  accept=".*"
-                />
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  className="text-sm text-blue-500 hover:text-blue-600"
-                >
-                  파일 선택
-                </button>
-              </div>
-
-              <div className="flex-1 flex items-center gap-4 p-3 bg-gray-50 rounded-lg h-[52px]">
-                <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-gray-500" />
-                  <span className="text-sm text-gray-600">만료 시간 설정</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="permanent"
-                      checked={isPermanent}
-                      onChange={(e) => {
-                        setIsPermanent(e.target.checked);
-                        if (e.target.checked) {
-                          setExpireMinutes(0);
-                        } else {
-                          setExpireMinutes(20);
-                        }
-                      }}
-                      className="w-4 h-4"
-                    />
-                    <label htmlFor="permanent" className="text-sm text-gray-600">
-                      영구 보존
-                    </label>
-                  </div>
-                  <select
-                    value={expireMinutes}
-                    onChange={(e) => setExpireMinutes(Number(e.target.value))}
-                    disabled={isPermanent}
-                    className={`text-sm border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 h-[34px] w-[120px] appearance-none bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")] bg-no-repeat bg-[length:16px_16px] bg-[right_8px_center] cursor-pointer ${
-                      isPermanent ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {expirationOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
             <div className={`${validationErrors.code ? 'border-red-500' : ''}`}>
               {renderEditorContainer()}
             </div>
@@ -951,12 +887,101 @@ export default function WritePage() {
               <div className="text-red-500 text-sm mt-2">{validationErrors.code}</div>
             )}
           </div>
-          <div className="flex justify-end">
-            <WriteButton 
-              onWrite={handleSubmit} 
-              onCancel={() => window.history.back()} 
-              disabled={isSubmitting}
-            />
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept=".txt,.js,.jsx,.ts,.tsx,.html,.css,.scss,.json,.md,.py,.java,.c,.cpp,.cs,.php,.rb,.go,.rs,.swift,.kt,.dart,.sh,.bat,.cmd,.ps1,.zip"
+                />
+                <button
+                  type="button"
+                  onClick={handleUploadClick}
+                  className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  <Upload size={16} />
+                  <span>파일 업로드</span>
+                </button>
+                {fileName && (
+                  <span className="text-sm text-gray-500 ml-1 truncate max-w-[200px]">
+                    {fileName}
+                  </span>
+                )}
+              </div>
+              <div className="h-4 w-px bg-gray-200"></div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="permanent"
+                    checked={isPermanent}
+                    onChange={(e) => {
+                      setIsPermanent(e.target.checked);
+                      if (e.target.checked) {
+                        setExpireMinutes(0);
+                      } else {
+                        setExpireMinutes(20);
+                      }
+                    }}
+                    className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
+                  />
+                  <label htmlFor="permanent" className="text-sm text-gray-600">
+                    영구 보존
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <select
+                      value={expireMinutes}
+                      onChange={(e) => setExpireMinutes(Number(e.target.value))}
+                      disabled={isPermanent}
+                      className={`text-sm border rounded-md px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                        isPermanent ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'
+                      }`}
+                    >
+                      {expirationOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs text-gray-500 flex items-center whitespace-nowrap">
+                    <Clock size={12} className="mr-1" />
+                    {isPermanent 
+                      ? "자동 삭제 없음"
+                      : `${expireMinutes}분 후 자동 삭제`}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>작성 중...</span>
+                  </div>
+                ) : (
+                  '작성하기'
+                )}
+              </button>
+            </div>
           </div>
         </form>
       </div>
