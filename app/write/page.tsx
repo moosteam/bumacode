@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Upload, Loader2, FileCode, Folder, Copy, Check, Download } from "lucide-react";
+import { Upload, Loader2, FileCode, Folder, Copy, Check, Download, Clock } from "lucide-react";
 import JSZip from "jszip";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -82,11 +82,29 @@ export default function WritePage() {
 
   const [isDragging, setIsDragging] = useState(false);
 
+  const [expireMinutes, setExpireMinutes] = useState(5);
+  const [isPermanent, setIsPermanent] = useState(false);
+
+  const expirationOptions = [
+    { value: 5, label: '5분' },
+    { value: 10, label: '10분' },
+    { value: 15, label: '15분' },
+    { value: 20, label: '20분' },
+    { value: 30, label: '30분' },
+    { value: 60, label: '1시간' },
+    { value: 120, label: '2시간' },
+    { value: 180, label: '3시간' },
+    { value: 240, label: '4시간' },
+    { value: 360, label: '6시간' },
+    { value: 720, label: '12시간' },
+    { value: 1440, label: '24시간' },
+  ];
+
   const CodeEditorLoadingSkeleton = () => (
     <div className="h-full bg-white" style={{ height: isZipMode ? editorHeight.zip : editorHeight.single }}>
       <div className="flex flex-col h-full">
         <div className="h-10 bg-gray-50 border-b animate-pulse"></div>
-        <div className="flex-1 flex">
+        <div className="flex-1 flex">20
           <div className="w-16 bg-gray-50 border-r animate-pulse"></div>
           <div className="flex-1 p-4">
             <div className="space-y-3">
@@ -455,6 +473,7 @@ export default function WritePage() {
     try {
       const formData = new FormData();
       formData.append('title', title);
+      formData.append('expireMinutes', isPermanent ? '0' : expireMinutes.toString());
       
       if (isZipMode) {
         if (originalZipFile instanceof File) {
@@ -786,15 +805,7 @@ export default function WritePage() {
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <div className="text-xs flex items-center">
-                    <button 
-                      className="flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
-                      onClick={handleCopyCode}
-                    >
-                      {copied ? <Check size={14} className="text-gray-600" /> : <Copy size={14} />}
-                      <span>{copied ? "복사됨" : "복사"}</span>
-                    </button>
-                  </div>
+                 
                 </div>
               </div>
               <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
@@ -869,16 +880,12 @@ export default function WritePage() {
           </div>
 
           <div className="mb-4">
-            <div className="flex justify-end items-center mb-8 mt-[-30]" style={{ marginTop: "-34px" }}>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  className="text-sm text-blue-500 flex items-center gap-1"
-                >
-                  <Upload size={14} />
-                  <span>파일 업로드</span>
-                </button>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg h-[52px]">
+                <div className="flex items-center gap-2">
+                  <Upload size={16} className="text-gray-500" />
+                  <span className="text-sm text-gray-600">파일 업로드</span>
+                </div>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -886,6 +893,55 @@ export default function WritePage() {
                   className="hidden"
                   accept=".*"
                 />
+                <button
+                  type="button"
+                  onClick={handleUploadClick}
+                  className="text-sm text-blue-500 hover:text-blue-600"
+                >
+                  파일 선택
+                </button>
+              </div>
+
+              <div className="flex-1 flex items-center gap-4 p-3 bg-gray-50 rounded-lg h-[52px]">
+                <div className="flex items-center gap-2">
+                  <Clock size={16} className="text-gray-500" />
+                  <span className="text-sm text-gray-600">만료 시간 설정</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="permanent"
+                      checked={isPermanent}
+                      onChange={(e) => {
+                        setIsPermanent(e.target.checked);
+                        if (e.target.checked) {
+                          setExpireMinutes(0);
+                        } else {
+                          setExpireMinutes(20);
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <label htmlFor="permanent" className="text-sm text-gray-600">
+                      삭제 안됨
+                    </label>
+                  </div>
+                  <select
+                    value={expireMinutes}
+                    onChange={(e) => setExpireMinutes(Number(e.target.value))}
+                    disabled={isPermanent}
+                    className={`text-sm border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 h-[34px] w-[120px] appearance-none bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")] bg-no-repeat bg-[length:16px_16px] bg-[right_8px_center] cursor-pointer ${
+                      isPermanent ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {expirationOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             <div className={`${validationErrors.code ? 'border-red-500' : ''}`}>
