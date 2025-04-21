@@ -450,8 +450,8 @@ export default function CodeDetailPage({ params }: { params: Promise<{ id: strin
                       </span>
                       <span className="ml-4 text-xs text-gray-600">
                         {formatFileSize(fileSize)}
-                      </span>
-                    </div>
+                      </span> 
+                    </div>  
                     <div className="flex items-center">
                       <div className="text-xs flex items-center space-x-2">
                         <button 

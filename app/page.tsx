@@ -22,6 +22,7 @@ export type Snippet = {
   type?: string;
   language?: string;
   deleteAfter?: string;
+  expireAt?: string;
 };
 
 export const codeSnippetsAtom = atomWithStorage<Snippet[]>("codeSnippets", []);
@@ -290,10 +291,7 @@ export default function Home() {
                   <div key={snippet.id} className="pt-3 pb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-gray-500 text-xs">
-                        {displayUserIp(snippet.userIp)}
-                      </span>
-                      <span className="text-gray-500 text-xs">
-                        {formattedDate}
+                        {displayUserIp(snippet.userIp)} · {snippet.expireAt === "영구보존됨" ? "삭제되지 않음" : `${snippet.expireAt} 삭제`}
                       </span>
                     </div>
 
